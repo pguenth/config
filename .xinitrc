@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# autostart
+python /home/patrick/coding/notifications/notify.py &
+
+# from openbox autostart, not sure why i added this
+# /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# xbindkeys for thinkpad hotkeys
+xbindkeys &
+
+# deactivate screen timeout
+if [ "$(cat /etc/hostname)" == "gunnar" ]; then
+    xset s off
+    xset s 0 0
+    xset -dpms
+fi
+
+# use EurKEY layout (though not listed in 'localectl list-x11-keymap-layouts' or '/usr/share/X11/xkb/rules/base.lst', this works)
+setxkbmap -layout eu -option caps:escape
+# compose key is not neccessary on this layout
+# setxkbmap -option compose:ralt
+
+# set cursor
+xsetroot -cursor_name left_ptr
+
+# activate scroll lock
+xmodmap -e 'add mod3 = Scroll_Lock'
+
+# recompile
+xmonad --recompile
+
+.screenlayouts/PLL.sh
+
+# start
+exec xmonad
+#openbox-session

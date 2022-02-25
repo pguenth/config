@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ACPI=$(acpi -i | grep -v "design capacity")
+echo $ACPI | sed -r 's/.*, ([0-9]+%).*/\1/'
+
+
+

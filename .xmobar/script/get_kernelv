@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo "linux $(uname -r | sed -r 's/([0-9.]+).*/\1/')"

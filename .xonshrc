@@ -1,0 +1,35 @@
+# XONSH WEBCONFIG START
+$PROMPT = '{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{gitstatus: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET} '
+$XONSH_COLOR_STYLE = 'native'
+# XONSH WEBCONFIG END
+
+#if $TILIX_ID or $VTE_VERSION:
+#    source-bash /etc/profile.d/vte.sh
+
+# map caps to escape for vim
+# now done in xinitrc/xsession
+# setxkbmap -option caps:escape
+from math import *
+import numpy as np
+
+def _ranger_cd(path=None):
+    temp_file = $(mktemp -t "ranger_cd.XXXXXXXX").strip()
+    path = path if not path is None else $PWD
+    ranger --choosedir=@(temp_file) -- @(path)
+    chosen_dir = $(cat -- @(temp_file))
+    if not chosen_dir == "" and chosen_dir != $PWD:
+        cd @(chosen_dir)
+    rm -f -- @(temp_file)
+
+def _treetasks_safe():
+    cp /home/patrick/.treetasks.xml /home/patrick/.treetasks.xml.backup
+    python /home/patrick/treetasks/treetasks.py
+
+aliases['r'] = _ranger_cd
+aliases['tudu'] = 'xonsh ~/tudu-wrapper.xsh'
+aliases['tt'] = _treetasks_safe
+aliases['sharevnc2'] = 'bash -c "export DISPLAY=:0; x0vncserver -rfbauth ~/.vnc/passwd -rfbport 5902"'
+aliases['sharevnc'] = 'x11vnc -display :0'
+aliases['setfbres'] = lambda args: $(xrandr --fb @(str(args[0]) + 'x' + str(args[1])))
+aliases['sshkeycheck'] = lambda args: $(cat @($HOME + "/.ssh/known_hosts") | grep @(args[0]) | ssh-keygen -lf -)
+aliases['sshkeyshow'] = lambda args: $(ssh -o VisualHostKey=yes -fN @(args[0]))

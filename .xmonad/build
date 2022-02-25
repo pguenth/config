@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $HOME/.xmonad
+ghc -v -i.: --make -dynamic -o "xmonad-$(uname -m)-linux" xmonad.hs 

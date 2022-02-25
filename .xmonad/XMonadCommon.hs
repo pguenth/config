@@ -81,6 +81,10 @@ mainDesktop :: IO()
 mainDesktop = xmonad . withSB mySBDesktop . workspaceNamesEwmh . ewmh . docks $ myConfigDesktop
 mySBDesktop = statusBarProp "xmobar -x 1 ~/.xmobar/xmobar-desktop-0.config" (workspaceNamesPP myXmobarPP)
 
+mainLatitude :: IO()
+mainLatitude = xmonad . withSB mySBLatitude . workspaceNamesEwmh . ewmh . docks $ myConfigLatitude
+mySBLatitude = statusBarProp "xmobar -x 0 ~/.xmobar/xmobar-latitude.config" (workspaceNamesPP myXmobarPP)
+
 mainThinkpad :: IO()
 mainThinkpad = xmonad . withSB (mySBThinkpad0 <> mySBThinkpad1) . workspaceNamesEwmh . ewmh . docks $ myConfigThinkpad
 mySBThinkpad0 = statusBarProp "xmobar -x 0 /home/patrick/.xmobar/xmobar-thinkpad-0.config" (workspaceNamesPP myXmobarPP)
@@ -92,6 +96,7 @@ mySBThinkpad1 = statusBarProp "xmobar -x 0 /home/patrick/.xmobar/xmobar-thinkpad
 
 -- compile config for either desktop or thinkpad
 myConfigDesktop = myConfig mod1Mask myTerminalDesktop myTerminalWrapperDesktop 
+myConfigLatitude = myConfig mod1Mask myTerminalDesktop myTerminalWrapperDesktop 
 myConfigThinkpad = myConfig mod4Mask myTerminalThinkpad myTerminalWrapperThinkpad  
 
 -- configs that differ

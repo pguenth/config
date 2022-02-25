@@ -150,7 +150,13 @@ font:
     style: Bold
 
   # Point size
-  size: 11.0
+{% if yadm.hostname == "haugitude" %}
+  size: 6.5
+{% endif %}
+
+{% if yadm.hostname == "gunnar" %}
+  size: 11
+{% endif %}
 
   # Offset is the extra space around each character. `offset.y` can be thought
   # of as modifying the line spacing, and `offset.x` as modifying the letter

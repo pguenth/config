@@ -152,7 +152,7 @@ set number
 set expandtab
 
 set encoding=utf-8
-" set clipboard=unnamedplus
+set clipboard=unnamedplus
 
 " Remap pane switching
 nnoremap <C-J> <C-W><C-J>
@@ -441,7 +441,7 @@ map <localleader> <Plug>(easymotion-prefix)
 " Vimtex
 let g:vimtex_view_method = 'zathura'
 let g:vimtex_view_forward_search_on_start = 1
-if empty(v:servername) && exists('*remote_startserver')
+if empty(v:servername) && exists('*remote_startserver') && has('clientserver')
   call remote_startserver('VIM')
 endif
 

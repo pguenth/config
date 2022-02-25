@@ -25,7 +25,28 @@ def _treetasks_safe():
     cp /home/patrick/.treetasks.xml /home/patrick/.treetasks.xml.backup
     python /home/patrick/treetasks/treetasks.py
 
+def _unified_cat_single(path=None):
+    if path is None:
+        return
+
+    ftype = $(stat -c '%F' @(path))
+    if ftype == 'directory\n':
+        width = int($(stty size).split()[1])
+        spacer = '─'
+        title = spacer * 3 + ' ls -la ' + path + ' '
+        print(title + spacer * (width - len(title)))
+        ls -la @(path)
+        print(spacer * width)
+    else:
+        bat @(path)
+
+def _unified_cat(paths):
+    for p in paths:
+        _unified_cat_single(p)
+    
+
 aliases['r'] = _ranger_cd
+aliases['uc'] = _unified_cat
 aliases['tudu'] = 'xonsh ~/tudu-wrapper.xsh'
 aliases['tt'] = _treetasks_safe
 aliases['sharevnc2'] = 'bash -c "export DISPLAY=:0; x0vncserver -rfbauth ~/.vnc/passwd -rfbport 5902"'

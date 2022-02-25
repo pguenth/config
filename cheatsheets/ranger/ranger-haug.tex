@@ -1,0 +1,424 @@
+% "Builtin normal mode keys of Vifm" cheatsheet
+%
+% Copyright (C) 2020 xaizek.
+% Made available under the terms of Apache 2.0 license.
+%
+% Note that LaTeX knowledge of the author is extermely limited and the code
+% below is probably of quite low quality.
+
+\documentclass[landscape]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{tikz}
+
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{fontawesome}
+\usepackage{setspace}
+
+\usepackage[paperwidth=32.5cm, paperheight=28cm] {geometry}
+\geometry{top=2mm,bottom=0mm,left=-3mm,right=0mm}
+
+\usepackage[oldsyntax]{stackengine}
+\newcommand\makeblock[3]{\parbox[t]{#1}{\textbf{#2}\\[2pt]#3}}
+\Sstackgap=1.5ex
+
+\setlength{\tabcolsep}{0.2em}
+
+% disable page numbers
+\pagestyle{empty}
+
+\newlength\unit
+\newlength\sep
+\newlength\base
+
+\setlength{\unit}{0.3cm}
+\setlength{\sep}{0.4\unit} %
+\setlength{\base}{4\unit}
+
+% comment this line for big keyboard (and increase page size)
+\def\shortkeyboard{\true}
+
+\definecolor{util}{gray}{0.5}
+\definecolor{note}{RGB}{75,75,205}
+\definecolor{keyname}{RGB}{225,75,75}
+
+\newcommand{\s}[1]{{\color{util}#1}}
+
+\newcommand{\note}[1]{{\color{note}(#1)}}
+
+\newcommand{\shortcut}[1]{\texttt{#1}}
+
+\newcommand{\keyname}[1]{{\color{keyname}\textbf{\footnotesize#1}}}
+\newcommand{\keydesc}[1]{
+    \begin{spacing}{0.75}
+        \sffamily\scriptsize#1
+    \end{spacing}
+}
+
+\def\fkeyd#1#2#3 {
+    \draw ++(\X,\Y)       rectangle +(\base,\base)
+           +(0,0.85\base) node[text width=10cm,text height=1,anchor=north west] {\keyname{#1}\vspace{3px}\keydesc{#2}};
+    \setlength{\X}{\X + \base + #3\sep}
+}
+\def\unusedfkey#1#2 { % the second argument is just to allow spaces before the first one
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(\base,\base);
+    \draw[nearly transparent,gray]
+         +(\X,\Y+0.85*\base) node[text width=10cm,text height=1,anchor=north west] {\keyname{#1}};
+    \setlength{\X}{\X + \base + #2\sep}
+}
+
+\def\longfkeyd(#1)#2#3 {
+    \draw ++(\X,\Y)       rectangle +(#1,1\base)
+           +(0,0.65\base) node[text width=10cm,text height=1,text ragged,anchor=north west] {\keyname{#2}\vspace{3px}\keydesc{#3}};
+    \setlength{\X}{\X + #1 + \sep}
+}
+\def\unusedlongfkey(#1)#2#3 { % the third argument is just to allow spaces before the second one
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(#1,\base);
+    \draw[nearly transparent,gray]
+         +(\X+0.1\base,\Y+0.5\base) node[text width=2,text height=1] {\keyname{#2}};
+    \setlength{\X}{\X + #1 + \sep}
+}
+
+\def\keyd#1#2,#3#4 {
+    \draw ++(\X,\Y) rectangle +(\base,\base)
+           +(0.47\base,0.8\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(0.47\base,0.3\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
+           +(0.23\base,0.72\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#2}}
+           +(0.23\base,0.22\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#4}};
+
+    \draw [densely dotted] ++(\X,\Y+0.5\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \sep}
+}
+\def\keydd#1#2,#3#4,#5#6 {
+    \draw ++(\X,\Y) rectangle +(\base,\base)
+           +(0.47\base,0.88\base)   node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(0.47\base,0.53\base)       node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
+           +(0.47\base,0.2\base)       node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#5}}
+           +(0.23\base,0.8\base) node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#2}}
+           +(0.23\base,0.47\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#4}}
+           +(0.23\base,0.13\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#6}};
+
+    \draw [densely dotted] ++(\X,\Y+0.67\base) -- +(\base,0);
+    \draw [densely dotted] ++(\X,\Y+0.33\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \sep}
+}
+
+\def\unusedkeyd#1#2,#3#4 {
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(\base,\base);
+    \draw[nearly transparent,gray]
+           +(\X+0.47\base,\Y+0.8\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(\X+0.47\base,\Y+0.3\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
+           +(\X+0.23\base,\Y+0.72\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#2}}
+           +(\X+0.23\base,\Y+0.22\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#4}};
+
+    \draw[nearly transparent,densely dotted]
+         ++(\X,\Y+0.5\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \sep}
+}
+
+\def\unusedkeydHalf#1#2,#3#4 {
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(\base,\base);
+    \draw[nearly transparent,gray]
+           +(\X+0.47\base,\Y+0.8\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(\X+0.23\base,\Y+0.72\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#2}};
+    \draw
+           +(\X+0.47\base,\Y+0.3\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
+           +(\X+0.23\base,\Y+0.22\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#4}};
+
+    \draw[densely dotted]
+         ++(\X,\Y+0.5\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \sep}
+}
+
+\def\unusedkey#1,#2 {
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(\base,\base);
+    \draw[nearly transparent,gray]
+         (\X+0.1\base,\Y+0.6\base) node[text width=1,text height=1,anchor=south] {\keyname{#1}}
+         +(0.0,-0.5\base)          node[text width=1,text height=1,anchor=south] {\keyname{#2}};
+
+    \draw[nearly transparent,densely dotted]
+         ++(\X,\Y+0.5\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \sep}
+}
+\def\unusedlongkey(#1)#2,#3 {
+    \fill[very nearly transparent,gray]
+         ++(\X,\Y) rectangle +(#1,\base);
+    \draw[nearly transparent,gray]
+          (\X+0.1\base,\Y+0.5\base) node[text width=2,text height=1,anchor=south] {\keyname{#2}}
+         +(0.0,-0.5\base)           node[text width=2,text height=1,anchor=south] {\keyname{#3}};
+
+    \draw[nearly transparent,densely dotted] ++(\X,\Y+0.5\base) -- +(#1,0);
+    \setlength{\X}{\X + #1 + \sep}
+}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=1.6]
+    \tikzstyle{every path}=[draw]
+
+    \pgfsetcornersarced{\pgfpoint{1mm}{1mm}}
+
+    \newlength\X
+    \newlength\Y
+
+    \Y=0\unit
+
+    \draw (0\unit,\Y + 0.9\unit)
+          node[text width=\textwidth,text height=10,text centered,anchor=west]
+          {\LARGE \scshape Ranger keybindings (haug)};
+    
+    \setlength{\Y}{\Y - \base - \unit + \sep}
+    % F row
+    \newcommand{\frowsep}{6}
+    \X=0\unit
+    \pgfmathparse{2*\frowsep}
+    \fkeyd          {Esc}{abort}{\pgfmathresult}
+    \fkeyd           {F1}{help}
+    \unusedfkey      {F2}
+    \fkeyd           {F3}{inspect\\file}
+    \fkeyd           {F4}{edit}{\frowsep}
+    \fkeyd           {F5}{copy}
+    \fkeyd           {F6}{cut}
+    \fkeyd           {F7}{:mkdir}
+    \fkeyd           {F8}{:delete}{\frowsep}
+    \unusedfkey      {F9}
+    \fkeyd           {F10}{:quit}
+    \unusedfkey      {F11}
+    \unusedfkey      {F12}
+\ifx \shortkeyboard \defined
+    \setlength{\X}{\X + 0.5\base - \sep}
+    \unusedfkey     {Print\\Screen}
+    \unusedfkey          {Scroll\\Lock}
+    \unusedfkey          {Pause}
+\fi
+    
+    \setlength{\Y}{\Y - \base - \unit - \sep}
+    % numeric row
+    \X=0\unit
+    \keyd           {\texttildelow}{},{`}{book-\\marks}
+    \keyd           !{:shell},1{\note{1}}
+    \keyd           @{:shell \%s},2{\note{1}}
+    \keyd           \#{:shell -p} ,3{\note{1}}
+    \keyd           {\textdollar}{},4{\note{1}}
+    \keyd     \%{},5{\note{1}}
+    \keyd           \^{},6{\note{1}}
+    \keyd           \&,7{\note{1}}
+    \keyd            *,8{\note{1}}
+    \keyd           ({},9{\note{1}}
+    \keyd           ){},0{\note{1}}
+    \keyd            \_,{\textendash}{chmod \note{2}}
+    \keyd           +{chmod \note{2}},={chmod \note{2}}
+    \unusedlongfkey (2\base)  {Backspace}
+\ifx \shortkeyboard \defined
+    \setlength{\X}{\X + 0.5\base - \sep}
+    \unusedfkey     {Insert}
+    \unusedfkey          {Home}{}
+    \unusedfkey          {Page\\Up}{}
+\fi
+
+    \setlength{\Y}{\Y - \base - \sep}
+    % upper row
+    \X=0\unit
+    \longfkeyd      (2\base - \unit) {Tab}{switch pane}
+    \keydd          {}{}, Q{quit},q{close tab}
+    \keydd          {}{}, W{show\\log},w{show\\tasks}
+    \keydd          {}{}, E{edit},e{:plocate /}
+    \keydd          {\textasciicircum R}{reset\\ranger},R{reload dir},r{:plocate}
+    \keydd          {}{}, T{:touch},t{newtab}
+    \keydd          {}{}, Y{back in\\history},y{yank \note{3}}
+    \keydd           {\textasciicircum U}{\textcolor{gray}{move up\\half page}},U{forward in\\history},u{undo}
+    \keydd          {}{}, I{:rename(app.\\after ext.)},i{inspect\\file}
+    \keydd          {}{}, O{:search\_next ...},o{sort}
+    \keydd          {}{}, P{},p{paste \note{3}}
+    \keyd           \{{},[{move up in\\parent dir}
+    \keyd           \}{traverse sub-\\directories},]{move down in\\parent dir}
+    \unusedlongkey  (\base + \unit) {\textbar},{\textbackslash}
+\ifx \shortkeyboard \defined
+    \setlength{\X}{\X + 0.5\base - \sep}
+    \unusedfkey     {Delete}
+    \unusedfkey          {End}{}
+    \unusedfkey          {Page\\Down}{}
+\fi
+
+    \setlength{\Y}{\Y - \base - \sep}
+    % home row
+    \X=0\unit
+    \longfkeyd (2\base) {Esc}{Abort}
+    \keydd          {\textasciicircum A}{:rename\\(new)}, A{:rename\\(keep suffix)},a{:rename\\(append)}
+    \keydd          {}{}, S{open shell},s{:shell}
+    \keydd           {\textasciicircum D}{\textcolor{gray}{move down\\half page}},D{:filter\_stack ...},d{cut \note{3, 4}}
+    \keydd           {\textasciicircum F}{:plocate ...},F{travel\\(fuzzy)},f{travel}
+    \keydd          {}{}, G{go to\\top},g{:cd ...}
+    \keydd           {}{},H{\textcolor{gray}{toggle hid-\\den files}},h{go up 1\\directory}
+    \keydd          {\textasciicircum J}{move down\\two pages}, J{move down\\half page},j{move down}
+    \keydd          {\textasciicircum K}{move up\\two pages}, K{move up\\half page},k{move up}
+    \keydd           {\textasciicircum L}{redraw},L{:open\_with},l{enter dir\\open file}
+    \keyd           :{console},;{console}
+    \keyd           "{tag files\\(custom tag)},'{open\\bookmarks}
+    \longfkeyd      (2\base + \sep) {Enter}{enter dir\\open file}
+
+    \setlength{\Y}{\Y - \base - \sep}
+    % lower row
+    \X=0\unit
+    \longfkeyd      (2\base + 2\sep) {Shift}{}
+    \keydd          {}{}, Z{ZZ/ZQ\\quit},z{toggle\\options}
+    \keydd          {}{},X{extract\\archive},x{tag files}
+    \keydd           {\textasciicircum C}{abort task},C{compress\\files},c{:filter}
+    \keydd          {\textasciicircum V}{invert\\selection}, V{visual mode\\unselect},v{visual mode}
+    \keydd           {\textasciicircum B}{\textcolor{gray}{move up\\one page}},B{change\\linemode\note{5}},b{toggle hid-\\den files}
+    \keydd           {\textasciicircum N}{\textcolor{gray}{new tab}},N{search previous},n{search next}
+    \keydd          {}{}, M{:mkdir},m{save\\bookmark}
+    \unusedkey           {\textless},,
+    \keyd           {\textgreater},.{\textcolor{gray}{:filter\_stack ...}}
+    \keyd           ?{show help},/{:search}
+    \longfkeyd      (3\base) {Shift}{}
+\ifx \shortkeyboard \defined
+    \setlength{\X}{\X + 0.5\base - \sep + \base + \sep}
+    \fkeyd          {$\uparrow$}{\shortcut{k}}
+\fi
+
+    \setlength{\Y}{\Y - \base - \sep}
+    % space row
+    \X=0\unit
+    \longfkeyd      (1.5\base + \sep) {Ctrl}{}
+    \unusedlongfkey (\base)           {\faLinux}
+    \unusedlongfkey (\base + \sep)    {Alt}
+    \longfkeyd      (7\base)          {Space}{select file}
+    \unusedlongfkey (\base + \sep)    {Alt}
+    \unusedlongfkey (\base)           {\faLinux}
+    \unusedlongfkey (\base + 2\sep)   {Menu}
+    \longfkeyd      (1.5\base + \sep) {Ctrl}{}
+\ifx \shortkeyboard \defined
+    \setlength{\X}{\X + 0.5\base - \sep}
+    \fkeyd          {$\leftarrow$}{\shortcut{h}}
+    \fkeyd          {$\downarrow$}{\shortcut{j}}
+    \fkeyd          {$\leftarrow$}{\shortcut{l}}
+\fi
+
+\end{tikzpicture}
+
+\def\blockA{
+    \makeblock{6cm}{Macros}{
+    Macros can be used in commands. They are like global variables with dynamic content.
+    \begin{itemize}
+        \item    \shortcut{\%f} -- The base name of the current file
+        \item    \shortcut{\%d} -- The path of the current directory
+        \item    \shortcut{\%s} -- The names of the currently selected files
+         \item   \shortcut{\%t} -- The names of all tagged files in this directory
+         \item   \shortcut{\%c} -- The paths of the currently copied files
+         \item   \shortcut{\%any} --  The key used in a key binding with \shortcut{<any>}. Example:  \shortcut{map x<any> shell -w echo \%any}
+         \item   \shortcut{\%rangerdir} -- The path to the ranger python module
+         \item   \shortcut{\%space}  -- Just a space, to avoid typing trailing spaces      
+    \end{itemize}   
+%         \begin{tabular}{lll}
+%             \shortcut{\%f} & -- & The base name of the current file\\
+%             \shortcut{\%d} & -- & The path of the current directory\\
+%             \shortcut{\%s} & -- & The names of the currently selected files\\
+%             \shortcut{\%t} & -- & The names of all tagged files in this directory\\
+%             \shortcut{\%c} & -- & The paths of the currently copied files\\
+%             \shortcut{\%any} & -- & The key used in a key binding with \shortcut{<any>}.\\
+%             &&Example:  \shortcut{map x<any> shell -w echo \%any}\\
+%             \shortcut{\%rangerdir} & -- & The path to the ranger python module\\
+%             \shortcut{\%space} & -- & Just a space, to avoid typing trailing spaces\\            
+%         \end{tabular}
+    Example: \shortcut{map yp shell echo \%d/\%f | xsel -i}
+    They can be escaped by replacing \shortcut{\%} with \shortcut{\%\%}.
+    }
+}
+\def\blockB{
+    \makeblock{6cm}{Config files}{
+    run \shortcut{ranger --copy-config=all} to copy the default config files to \texttt{\texttildelow /.config/ranger/}.
+    \begin{itemize}
+      \item \shortcut{rc.conf} -- A list of commands that are executed when ranger starts. Options, key bindings and aliases are found here. Pro tip: Adding \texttt{export RANGER\_LOAD\_DEFAULT\_RC=FALSE} to your shell rc will skip loading the default \texttt{rc.conf} before your own.
+      \item \shortcut{commands.py} --  A python script containing custom commands
+      \item \shortcut{rifle.conf} -- Rules for rifle, the file opener. Each lines looks like \texttt{list of conditions = command}.
+        When ranger opens a file, it tests those conditions. The first command where all conditions are true will be executed.
+      \item \shortcut{scope.sh} -- The script that generates file previews. Plugins can be put in the \texttt{plugins/} subdirectory,
+        colorschemes in \texttt{colorschemes/}. See \texttt{/usr/share/doc/ranger/examples}.
+    \end{itemize}
+   }
+}
+\def\blockC{
+    \makeblock{6cm}{Commands}{
+    Commands can be typed in by pressing \shortcut{:} or added to \texttt{\texttildelow /.config/ranger/rc.conf} to apply then whenever ranger starts. All commands are listed in the man page. Some important ones:
+    \begin{itemize}
+      \item \shortcut{:shell [<flags>] <command>} calls the given \texttt{<command>} with the shell specified in the environment variable \texttt{\$SHELL}. \texttt{<flags>} can be \texttt{\-f} to fork the process or \texttt{\-p} to pipe the output to a pager. Macros like \shortcut{\%f} and \shortcut{\%s} are especially useful here. Example: \texttt{:shell -f inkscape \%f} or \texttt{:shell sudo cp \%c ./}
+      \item \shortcut{:alias <new> <old>} creates the command \texttt{<new>} that calls \texttt{<old>}. The neat thing is that you can pass arguments to the next command. Example: \texttt{:alias touch shell touch} will allow you to type \texttt{:touch FILE}, which will be translated to \texttt{:shell touch FILE}.
+      \item \shortcut{:map <key> <command>} makes the \texttt{<key>} run \texttt{<command>} when pressed. This is the typical way todefine key bindings in \texttt{rc.conf}. There is also \texttt{pmap} to define keys in the pager and \texttt{unmap} and \texttt{punmap} to remove key bindings.
+    \end{itemize}
+    }
+}
+\def\blockD{
+    \makeblock{6cm}{\note{1} quantifiers}{
+      numbers can be used as a quantifier in various commands, for example \texttt{5j} will movethe cursor down 5 by lines, \texttt{3<space>} selects 3 files, \texttt{4<TAB>} moves you to the 4th tab.
+    }
+}
+\def\blockE{
+    \makeblock{6cm}{\note{2} chmod}{
+    the keys \shortcut{-}, \shortcut{-} and \shortcut{=} change the permissions of files. See \texttt{man chmod}.
+    \begin{itemize}
+      \item \shortcut{[+-][augo][rwxXst]} (e.g. +gw means "add write permissions to the group)
+      \item \shortcut{[+-][rwxXst]} (e.g. -x means "remove execute permissions from everybody")
+      \item \shortcut{<octal>=} (e.g. 777= means "give full permissions to everybody")
+    \end{itemize} 
+    }
+}
+\def\blockF{
+    \makeblock{6cm}{\note{3} yank, copy, paste}{
+    To copy files, select them with the cursor (or \texttt{<space>}, in case of multiple files). Type \shortcut{dd} (to cut) or \shortcut{yy} (to copy). Move to the destination and type \shortcut{pp}. Type \shortcut{da} (or \shortcut{ya}) to add files to the copy buffer, allowing you to copy from multiple folders.
+    }
+}
+\def\blockG{
+    \makeblock{6cm}{\note{4} d*}{
+      \shortcut{d} also starts the keybindings
+      \begin{itemize}
+        \item \shortcut{dc} (calculate size of the content of a directory)
+        \item \shortcut{du}/\shortcut{dU} (calculate directory size with the \texttt{du} program)
+        \item \shortcut{dD} (open the console with ":delete")
+      \end{itemize}
+    }
+}
+\def\blockH{
+    \makeblock{6cm}{\note{5} linemode}{
+    \shortcut{M<key>} changes the linemode, the way files are drawn.
+    \begin{itemize}
+      \item \shortcut{Mf} draws just the file name
+      \item \shortcut{Mp} draws permissions
+      \item \shortcut{Mi} draws file type information
+      \item \shortcut{Mt} draws metadata, as defined with the \texttt{:meta} command.
+    \end{itemize}
+   You can add custom linemodes as described in \texttt{/usr/share/doc/ranger/examples/plugin\_linemode.py}.
+    }
+}
+\def\blockI{
+    \makeblock{6cm}{Hints}{
+    Various helpful things
+    \begin{itemize}
+      \item \shortcut{:eval fm.copy\_buffer.clear()} Empties the copy buffer (maybe there is a better method though)
+    \end{itemize}
+    }
+}
+
+\vspace{+2ex}
+\scriptsize
+\Shortunderstack{ {\protect\blockA} {\protect\blockI} }
+\Shortunderstack{ {\protect\blockB}  }
+\Shortunderstack{ {\protect\blockC}  }
+\Shortunderstack{ {\protect\blockD} {\protect\blockE} {\protect\blockF} }
+\Shortunderstack{ {\protect\blockG} {\protect\blockH} }
+%\Shortunderstack{ {\protect\blockK} }
+%\Shortunderstack{ {\protect\blockG} {\protect\blockF}
+%                   {
+%                     \begin{tabular}{r}
+%                         \vspace{72pt}\\
+%                         \scriptsize \s{for Vifm v0.11 (\today)}\\
+%                     \end{tabular}
+%                   } }
+
+\end{document}

@@ -12,6 +12,18 @@ $XONSH_COLOR_STYLE = 'native'
 from math import *
 import numpy as np
 
+xontrib load abbrevs
+xontrib load whole_word_jumping
+xontrib load hist_navigator
+xontrib load fzf-widgets
+
+$fzf_history_binding = "c-l"  # Ctrl+R
+$fzf_ssh_binding = "c-s"      # Ctrl+S
+$fzf_file_binding = "c-j"      # Ctrl+T
+$fzf_dir_binding = "c-k"      # Ctrl+G
+$fzf_find_command = "fd"
+$fzf_find_dirs_command = "fd -t d"
+
 def _ranger_cd(path=None):
     temp_file = $(mktemp -t "ranger_cd.XXXXXXXX").strip()
     path = path if not path is None else $PWD
@@ -25,11 +37,18 @@ def _treetasks_safe():
     cp /home/patrick/.treetasks.xml /home/patrick/.treetasks.xml.backup
     python /home/patrick/treetasks/treetasks.py
 
+def _type_follow_link(path):
+    ftype = $(stat -c '%F' @(path))
+    if ftype == 'symbolic link\n':
+        return _type_follow_link($(readlink @(path)).splitlines()[0])
+    else:
+        return ftype
+
 def _unified_cat_single(path=None):
     if path is None:
         return
 
-    ftype = $(stat -c '%F' @(path))
+    ftype = _type_follow_link(path)
     if ftype == 'directory\n':
         width = int($(stty size).split()[1])
         spacer = '─'
@@ -41,10 +60,35 @@ def _unified_cat_single(path=None):
         bat @(path)
 
 def _unified_cat(paths):
+    if len(paths) == 0:
+        _unified_cat_single(".")
+
     for p in paths:
         _unified_cat_single(p)
+
+def _print_help():
+    print("Keybindings:")
+    print("    C-J      Fuzzy-search files")
+    print("    C-K      Fuzzy-search directories")
+    print("    C-L      Fuzzy-search history")
+    print("    C-S      Fuzzy-search ssh hosts")
+    print("    A-Up     cd ..")
+    print("    A-Left   Directory history backward")
+    print("    A-Right  Directory history forward")
+    print("    S-DEL    Delete one word")
+    print("")
+    print("Useful aliases:")
+    print("    r     ranger with cd-functionality")
+    print("    uc    unified cat: uses 'ls -la' or 'bat' depending on file type")
+    print("    h     show this help")
+    print("    tt    open treetasks after backing the old .treetasks.xml file up")
+    print("    For more aliases look into ~/.xonshrc file")
+    print("")
+    print("Abbreviations:")
+    print("    Use the dict 'abbrevs' to add abbreviations which are automatically expanded.")
     
 
+aliases['h'] = _print_help
 aliases['r'] = _ranger_cd
 aliases['uc'] = _unified_cat
 aliases['tudu'] = 'xonsh ~/tudu-wrapper.xsh'

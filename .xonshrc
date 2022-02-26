@@ -98,3 +98,4 @@ aliases['sharevnc'] = 'x11vnc -display :0'
 aliases['setfbres'] = lambda args: $(xrandr --fb @(str(args[0]) + 'x' + str(args[1])))
 aliases['sshkeycheck'] = lambda args: $(cat @($HOME + "/.ssh/known_hosts") | grep @(args[0]) | ssh-keygen -lf -)
 aliases['sshkeyshow'] = lambda args: $(ssh -o VisualHostKey=yes -fN @(args[0]))
+aliases['lsb'] = lambda args: $(echo @(args[0]) > /sys/class/backlight/intel_backlight/brightness)

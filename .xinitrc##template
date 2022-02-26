@@ -30,6 +30,9 @@ xmodmap -e 'add mod3 = Scroll_Lock'
 # recompile
 xmonad --recompile
 
+# use wmname to enable java swing applications to work
+# 
+wmname compiz
 
 # activate tapping
 {% if yadm.hostname == "haugitude" %}

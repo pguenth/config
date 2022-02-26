@@ -277,6 +277,9 @@ Plug 'Yilin-Yang/vim-markbar'
 " Indentation detection
 Plug 'https://github.com/Raimondi/yaifa'
 
+" Xonsh syntax
+Plug 'meatballs/vim-xonsh'
+
 " Git
 " highlight changed lines
 Plug 'airblade/vim-gitgutter'

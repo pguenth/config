@@ -231,9 +231,9 @@
     \keydd          {}{}, E{edit},e{:plocate /}
     \keydd          {\textasciicircum R}{reset\\ranger},R{reload dir},r{:plocate}
     \keydd          {}{}, T{:touch},t{newtab}
-    \keydd          {}{}, Y{back in\\history},y{yank \note{3}}
-    \keydd           {\textasciicircum U}{\textcolor{gray}{move up\\half page}},U{forward in\\history},u{undo}
-    \keydd          {}{}, I{:rename(app.\\after ext.)},i{inspect\\file}
+    \keydd          {}{}, Y{inspect\\file},y{yank \note{3}}
+    \keydd           {\textasciicircum U}{\textcolor{gray}{move up\\half page}},U{undo \note{6}},u{forward in\\history}
+    \keydd          {}{}, I{:rename(app.\\after ext.)},i{back in\\history}
     \keydd          {}{}, O{:search\_next ...},o{sort}
     \keydd          {}{}, P{},p{paste \note{3}}
     \keyd           \{{},[{move up in\\parent dir}
@@ -404,6 +404,19 @@
     \end{itemize}
     }
 }
+\def\blockJ{
+    \makeblock{6cm}{\note{6} U*}{
+      \shortcut{U} also starts the keybindings
+      \begin{itemize}
+    \item \shortcut{Um<key>} delete bookmark <key>
+    \item \shortcut{Uv} unmark all files (clear selection)
+    \item \shortcut{UV} visual unselect
+    \item \shortcut{Uq} restore closed tab
+    \item \shortcut{UT}/\shortcut{Ut} remove tag
+    \item \shortcut{Ud}/\shortcut{Uy} uncut
+      \end{itemize}
+    }
+}
 
 \vspace{+2ex}
 \scriptsize
@@ -411,7 +424,7 @@
 \Shortunderstack{ {\protect\blockB}  }
 \Shortunderstack{ {\protect\blockC}  }
 \Shortunderstack{ {\protect\blockD} {\protect\blockE} {\protect\blockF} }
-\Shortunderstack{ {\protect\blockG} {\protect\blockH} }
+\Shortunderstack{ {\protect\blockG} {\protect\blockH} {\protect\blockJ} }
 %\Shortunderstack{ {\protect\blockK} }
 %\Shortunderstack{ {\protect\blockG} {\protect\blockF}
 %                   {

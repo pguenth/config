@@ -30,8 +30,15 @@ xmodmap -e 'add mod3 = Scroll_Lock'
 # recompile
 xmonad --recompile
 
-.screenlayouts/PLL.sh
+
+# activate tapping
+{% if yadm.hostname == "haugitude" %}
+xinput set-prop "DLL079F:01 044E:120B" "libinput Tapping Enabled"
+{% endif %}
 
 # start
 exec xmonad
-#openbox-session
+
+{% if yadm.hostname == "gunnar" %}
+.screenlayouts/PLL.sh
+{% endif %}

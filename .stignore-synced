@@ -1,0 +1,14 @@
+!/.password-store/**
+!/.gnupg/**
+
+!/.config/slack-term/config
+!/.local/share/ranger/bookmarks
+!/.local/share/ranger/tagged
+!/.treetasks.xml
+
+/.**
+/.cache/**
+/aur/**
+/node_modules/**
+/qemu/**
+**/__pycache__/**

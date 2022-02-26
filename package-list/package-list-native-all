@@ -5,6 +5,7 @@ autoconf
 automake
 avfs
 base
+bash-completion
 bat
 biber
 bison
@@ -14,6 +15,7 @@ dhcpcd
 dialog
 element-desktop
 fakeroot
+fd
 ffmpeg
 firefox
 flex
@@ -50,6 +52,7 @@ pdftk
 pipewire
 pipewire-alsa
 pipewire-pulse
+pipewire-v4l2
 pkgconf
 plocate
 python
@@ -85,6 +88,7 @@ tigervnc
 ttf-inconsolata
 ueberzug
 unzip
+usbutils
 viewnior
 vim
 vlc
@@ -145,7 +149,9 @@ xorg-xwininfo
 xorg-xwud
 xterm
 yadm
+youtube-dl
 zathura
 zathura-djvu
 zathura-pdf-poppler
 zathura-ps
+zvbi

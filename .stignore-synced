@@ -11,4 +11,5 @@
 /aur/**
 /node_modules/**
 /qemu/**
+/package-list/**
 **/__pycache__/**

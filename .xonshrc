@@ -9,18 +9,38 @@ $XONSH_COLOR_STYLE = 'native'
 # map caps to escape for vim
 # now done in xinitrc/xsession
 # setxkbmap -option caps:escape
+#
+
+from prompt_toolkit.keys import Keys
+from xonsh.built_ins import XSH
+
+@XSH.builtins.events.on_ptk_create
+def custom_keybindings(bindings, **kw):
+    # copied from the whole_word_jumping xontrib
+    # I only want the shift-delete
+    
+    @bindings.add(Keys.ShiftDelete)
+    def shift_delete(event):
+        buff = event.current_buffer
+        startpos, endpos = buff.document.find_boundaries_of_current_word(WORD=True)
+        startpos = buff.cursor_position + startpos - 1
+        startpos = 0 if startpos < 0 else startpos
+        endpos = buff.cursor_position + endpos
+        endpos = endpos + 1 if startpos == 0 else endpos
+        buff.text = buff.text[:startpos] + buff.text[endpos:]
+        buff.cursor_position = startpos
+
 from math import *
 import numpy as np
 
 xontrib load abbrevs
-xontrib load whole_word_jumping
 xontrib load hist_navigator
 xontrib load fzf-widgets
 
-$fzf_history_binding = "c-l"  # Ctrl+R
-$fzf_ssh_binding = "c-s"      # Ctrl+S
-$fzf_file_binding = "c-j"      # Ctrl+T
-$fzf_dir_binding = "c-k"      # Ctrl+G
+$fzf_history_binding = "c-a"  # Ctrl+R
+$fzf_ssh_binding = "c-g"      # Ctrl+S
+$fzf_file_binding = "c-e"      # Ctrl+T
+$fzf_dir_binding = "c-w"      # Ctrl+G
 $fzf_find_command = "fd"
 $fzf_find_dirs_command = "fd -t d"
 
@@ -67,11 +87,24 @@ def _unified_cat(paths):
         _unified_cat_single(p)
 
 def _print_help():
+    print("Keybindings from xonsh:")
+    print("    C-F       Apply current suggestion (undocumented I think)")
+    print("    C-X C-E   Open the current buffer in editor")
+    print("    C-J       Execute the current buffer (especially in multiline statements)")
+    print("    S-Arrow   Highlight/select text") 
+    print("    C-S-Arrow Highlight/select text (one word per step)") 
+    print("    C-X C-C   Copy selected text")
+    print("    C-X C-X   Cut selected text")
+    print("    C-V       Paste clipboard (not the system clipboard, only the xonsh clipboard)")
+    print("    C-R       History search")
+    print("    C-I       Same as <Tab>")
+    print("    C-Right   Auto-complete a single word")
+    print("    C-D, C-C, C-Z have their usual effect")
     print("Keybindings:")
-    print("    C-J      Fuzzy-search files")
-    print("    C-K      Fuzzy-search directories")
-    print("    C-L      Fuzzy-search history")
-    print("    C-S      Fuzzy-search ssh hosts")
+    print("    C-E      Fuzzy-search files")
+    print("    C-W      Fuzzy-search directories")
+    print("    C-A      Fuzzy-search history")
+    print("    C-G      Fuzzy-search ssh hosts")
     print("    A-Up     cd ..")
     print("    A-Left   Directory history backward")
     print("    A-Right  Directory history forward")

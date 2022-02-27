@@ -1,2 +1,17 @@
-!/.stignore-synced
-#include .stignore-synced
+!/.password-store
+!/.gnupg
+!/.treetasks.xml
+
+// symlinks to enable syncthing to ignore the ignored directories
+// symlinks dont work (are not followed), ignoring those files for the moment
+// https://github.com/syncthing/syncthing/issues/1776
+//!/.local_share_ranger_bookmarks
+//!/.local_share_ranger_tagged
+
+/.**
+/.cache/**
+/aur/**
+/node_modules/**
+/qemu/**
+/package-list/**
+**/__pycache__/**

@@ -31,7 +31,8 @@ xmodmap -e 'add mod3 = Scroll_Lock'
 xmonad --recompile
 
 # use wmname to enable java swing applications to work
-# 
+# https://wiki.archlinux.org/title/Java#Impersonate_another_window_manager
+# https://wiki.archlinux.org/title/Java#Gray_window,_applications_not_resizing_with_WM,_menus_immediately_closing
 wmname compiz
 
 # activate tapping

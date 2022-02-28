@@ -56,6 +56,7 @@ pipewire-v4l2
 pkgconf
 plocate
 python
+python-beautifulsoup4
 python-matplotlib
 python-numpy
 python-pip
@@ -96,6 +97,7 @@ vpnc
 which
 wireplumber
 wpa_supplicant
+xbindkeys
 xf86-video-vesa
 xmobar
 xonsh

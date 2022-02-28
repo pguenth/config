@@ -40,9 +40,14 @@ wmname compiz
 xinput set-prop "DLL079F:01 044E:120B" "libinput Tapping Enabled"
 {% endif %}
 
-# start
-exec xmonad
-
 {% if yadm.hostname == "gunnar" %}
 .screenlayouts/PLL.sh
 {% endif %}
+
+# source scripts from /etc/X11/xinit/xinitrc.d
+# xdm returns without starting X successfully when this is active
+#for f in $(find /etc/X11/xinit/xinitrc.d/ -type f).splitlines():
+#    @(f)
+
+# start
+exec xmonad

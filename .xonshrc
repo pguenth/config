@@ -33,6 +33,11 @@ def custom_keybindings(bindings, **kw):
 from math import *
 import numpy as np
 
+import astropy.constants as const
+#import astropy.units as units
+import pint
+u = pint.UnitRegistry()
+
 xontrib load abbrevs
 xontrib load hist_navigator
 xontrib load fzf-widgets
@@ -133,4 +138,15 @@ aliases['setfbres'] = lambda args: $(xrandr --fb @(str(args[0]) + 'x' + str(args
 aliases['sshkeycheck'] = lambda args: $(cat @($HOME + "/.ssh/known_hosts") | grep @(args[0]) | ssh-keygen -lf -)
 aliases['sshkeyshow'] = lambda args: $(ssh -o VisualHostKey=yes -fN @(args[0]))
 aliases['lsb'] = lambda args: $(echo @(args[0]) > /sys/class/backlight/intel_backlight/brightness)
-aliases['bfp'] = 'python coding/bfp/dialog.py'
+aliases['bfp'] = 'python ~/coding/bfp/dialog.py'
+aliases['startvnc'] = 'killall ssh; ssh -fNL 9901:localhost:5901 trspofsuwz5ecp88.myfritz.net -p 54843; vncviewer localhost:9901'
+
+abbrevs['sd'] = 'sudo systemctl'
+abbrevs['sdon'] = 'sudo systemctl start'
+abbrevs['sdoff'] = 'sudo systemctl stop'
+abbrevs['na'] = 'netctl-auto@wlp2s0.service'
+abbrevs['nadown'] = 'sudo systemctl stop netctl-auto@wlp2s0.service'
+abbrevs['naup'] = 'sudo systemctl start netctl-auto@wlp2s0.service'
+abbrevs['nctlup'] = 'sudo netctl start wlp2s0-'
+abbrevs['nctldown'] = 'sudo netctl stop wlp2s0-'
+abbrevs['py'] = 'python'

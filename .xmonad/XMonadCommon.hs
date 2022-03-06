@@ -117,6 +117,11 @@ myWorkspaces = map show [1..9 :: Int]
 -- folder to store screenshots with scrot
 screenshotPath = "/home/patrick/screenshots"
 
+xpfont = "SourceCodePro-9:style=Bold"
+
+xpconf :: XPConfig
+xpconf = def { bgColor = "#000000", font = "xft:" ++ xpfont }
+
 -- keybindings given in Emacs format for Utils.EZConfig
 keysSourceP myTerminal terminalWrapper myModMask = [
         -- Move windows across workspaces
@@ -170,15 +175,15 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-<Tab>", cycleWS' myModMask)
       , ("M-S-<Tab>", windows W.focusDown)
       , ("M-c", (sendMessage $ Toggle MYMIRROR) >> (multiSpawn ["telegram-desktop", "thunderbird", "element-desktop", terminalWrapper "Treetasks" "python /home/patrick/treetasks/treetasks.py"]))
-      , ("M-l", gotoMenu) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
+      , ("M-l", gotoMenuConfig $ def { menuArgs = ["-b", "-fn", xpfont, "-i"]} ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
       , ("M-f", viewEmptyWorkspace)
-      , ("M-b", renameWorkspace def)
+      , ("M-b", renameWorkspace xpconf )
       , ("M-S-v", sendMessage ToggleStruts)
 
       -- DynamicWorkspaceGroups
-      , ("M-S-b", promptWSGroupForget def "Forget ")
-      , ("M-S-n", promptWSGroupAdd def "Add to ")
-      , ("M-n", promptWSGroupView def "Go to ")
+      , ("M-S-b", promptWSGroupForget xpconf "Forget ")
+      , ("M-S-n", promptWSGroupAdd xpconf "Add to ")
+      , ("M-n", promptWSGroupView xpconf "Go to ")
 
         -- changing layout properties
       , ("M-S-h", sendMessage Shrink) -- %! Shrink the master area

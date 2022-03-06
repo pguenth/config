@@ -10,11 +10,11 @@ python /home/patrick/coding/notifications/notify.py &
 xbindkeys &
 
 # deactivate screen timeout
-if [ "$(cat /etc/hostname)" == "gunnar" ]; then
-    xset s off
-    xset s 0 0
-    xset -dpms
-fi
+#if [ "$(cat /etc/hostname)" == "gunnar" ]; then
+xset s off
+xset s 0 0
+xset -dpms
+#fi
 
 # use EurKEY layout (though not listed in 'localectl list-x11-keymap-layouts' or '/usr/share/X11/xkb/rules/base.lst', this works)
 setxkbmap -layout eu -option caps:escape

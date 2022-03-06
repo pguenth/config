@@ -13,6 +13,7 @@ ctags
 darktable
 dhcpcd
 dialog
+dmenu
 element-desktop
 fakeroot
 fd
@@ -98,6 +99,7 @@ which
 wireplumber
 wpa_supplicant
 xbindkeys
+xclip
 xf86-video-vesa
 xmobar
 xonsh

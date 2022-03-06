@@ -8,6 +8,7 @@ The configuration of the following tools is managed:
  * xmonad
  * xmobar
  * vnc
+ * zathura
 
 Additionally, ssh pubkeys for all my machines are stored in `.ssh/authorized_keys_def`. Activate this file by adding it to the option `AuthorizedKeysFile` in `/etc/ssh/sshd_config`.
 
@@ -19,3 +20,6 @@ So far this should be in principle transferrable to every distribution. The pack
     * `-essential-groups`: Native packages, where all packages from big package groups have been replaced by their group name (for convienience when reading)
     * `-nonessential`: potentially large packages (or packages requiring large dependencies) which can be considered depending on the use case of the installation
  * `-foreign`: AUR and other packages
+
+Things that need to be configured otherwise:
+ * `vpnc` /etc/vpnc/home.conf is not tracked by this repository

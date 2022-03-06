@@ -12,6 +12,7 @@ bison
 ctags
 dhcpcd
 dialog
+dmenu
 fakeroot
 fd
 ffmpeg
@@ -85,6 +86,7 @@ which
 wireplumber
 wpa_supplicant
 xbindkeys
+xclip
 xf86-video-vesa
 xmobar
 xonsh

@@ -15,4 +15,8 @@
 /qemu/**
 /package-list/**
 /README.md
+/cheatsheets/ranger/ranger-haug.tex
+/cheatsheets/ranger/ranger-haug.pdf
+/cheatsheets/xmonad/xmonad-haug.tex
+/cheatsheets/xmonad/xmonad-haug.pdf
 **/__pycache__/**

@@ -295,7 +295,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'easymotion/vim-easymotion'
 
 " Scrolling nice
-Plug 'joeytwiddle/sexy_scroller.vim'
+" Works like shit
+" Plug 'joeytwiddle/sexy_scroller.vim'
 
 
 Plug 'junegunn/fzf'
@@ -326,8 +327,13 @@ Plug 'jeffkreeftmeijer/vim-numbertoggle'
 " move objects
 Plug 'matze/vim-move'
 
+" Plug 'ggandor/lightspeed.nvim' " use for s instead of vim-easymotion
+"Plug 'justinmk/vim-sneak'
+"Plug 't9md/vim-smalls'
+Plug 'rhysd/clever-f.vim'
+
 " complete
-" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " store folds
 "Plug 'zhimsel/vim-stay'
@@ -353,6 +359,7 @@ Plug 'matze/vim-move'
 call plug#end()
 
 endif
+
 
 let g:CtrlSpaceDefaultMappingKey = "<leader>f"
 "if has("gui_running")
@@ -432,14 +439,38 @@ function! SynStack2 ()
 endfunction
 
 " SexyScroller values
-let g:SexyScroller_MaxTime=800
-let g:SexyScroller_EasingStyle=3
-let g:SexyScroller_ScrollTime=8
-let g:SexyScroller_MinLines = 30
-let g:SexyScroller_MinColumns = 200
+" let g:SexyScroller_MaxTime=800
+" let g:SexyScroller_EasingStyle=3
+" let g:SexyScroller_ScrollTime=8
+" let g:SexyScroller_MinLines = 30
+" let g:SexyScroller_MinColumns = 200
 
-" easymotion to localleader
-map <localleader> <Plug>(easymotion-prefix)
+" Movement: easymotion and sneak
+" map <localleader> <Plug>(easymotion-prefix)
+" one character jump
+map <Leader>d <Plug>(easymotion-bd-f)
+nmap <Leader>d <Plug>(easymotion-overwin-f)
+" 2 character jump
+nmap s <Plug>(easymotion-overwin-f2)
+" Lines
+map <Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader>l <Plug>(easymotion-overwin-line)
+" Words
+map <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+" Sneak versions (replaced by clever-f)
+" nmap f <Plug>Sneak_f
+" nmap F <Plug>Sneak_F
+" nmap t <Plug>Sneak_t
+" nmap T <Plug>Sneak_T
+" clever-f
+let g:clever_f_show_prompt = 1
+let g:clever_f_smart_case = 1
+let g:clever_f_fix_key_direction = 1
+let g:clever_f_timeout_ms = 1000
+let g:clever_f_highlight_timeout_ms = 1000
+let g:clever_f_chars_match_any_signs = ';'
+" nmap ; <Plug>(clever-f-reset)
 
 " Vimtex
 let g:vimtex_view_method = 'zathura'

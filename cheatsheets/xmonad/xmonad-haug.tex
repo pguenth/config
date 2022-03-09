@@ -157,11 +157,11 @@
 \def\keydd#1#2,#3#4,#5#6,#7#8#9 {
     \begin{scope}
         \clip [] ++(\X, \Y) rectangle ++(\base, \base);
-        \fill [#7, rounded corners=0] (\X,\Y)
+        \fill [#9, rounded corners=0] (\X,\Y)
           rectangle +(\base, 0.33\base); 
         \fill [#8, rounded corners=0] (\X,\Y + 0.33\base)
           rectangle +(\base, 0.34\base);
-        \fill [#9, rounded corners=0] (\X,\Y + 0.67\base)
+        \fill [#7, rounded corners=0] (\X,\Y + 0.67\base)
           rectangle +(\base, 0.33\base);
     \end{scope}
 
@@ -299,10 +299,10 @@
     % upper row
     \X=0\unit
     \longfkeydd      (2\base - \unit) {Tab}{cycle focus forwards}{cycle recent WS},{groupSwitchWindows}{groupWS}
-    \keydd           {\textasciicircum Q}{move WS to S1},Q{move window to S1},q{go to S1},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
-    \keydd           {\textasciicircum W}{move WS to S2},W{move window to S2},w{go to S2},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
-        \keydd          {\textasciicircum E}{move WS to S3},E{move window to S3},e{go to S3},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
-        \keydd          {\textasciicircum R}{move WS to S4},R{move window to S4},r{go to S4},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
+    \keydd           {\textasciicircum Q}{move WS to S1},Q{move window to S1},q{go to S1},{groupWS}{groupMoveWindows}{groupScreens}
+    \keydd           {\textasciicircum W}{move WS to S2},W{move window to S2},w{go to S2},{groupWS}{groupMoveWindows}{groupScreens}
+    \keydd          {\textasciicircum E}{move WS to S3},E{move window to S3},e{go to S3},{groupWS}{groupMoveWindows}{groupScreens}
+        \keydd          {\textasciicircum R}{move WS to S4},R{move window to S4},r{go to S4},{groupWS}{groupMoveWindows}{groupScreens}
     \keyd          T{banish cursor},t{unfloat window},{white}{groupMoveWindows}
     \keyd           Y{quit XMonad},y{recompile XMonad},{white}{white}
     \keyd           U{},u{deactivate keybindings},{white}{white}
@@ -420,7 +420,7 @@
         \item \legendbox{groupApplications} Run commands and applications
         \item  \legendbox{groupSwitchWindows} Select the currently focused window
         \item \legendbox{groupMoveWindows} Move windows around
-        \item \legendbox{groupWS} Go to workspace
+        \item \legendbox{groupWS} Go to/move workspace
         \item \legendbox{groupScreens} Go to screen
         \item  \legendbox{groupLayout} Switch or modify the current layout
       \end{itemize}

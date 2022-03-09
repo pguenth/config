@@ -49,7 +49,8 @@ import XMonad.Actions.WindowBringer
 import XMonad.Actions.WorkspaceNames
 import XMonad.Actions.DynamicWorkspaceGroups
 import XMonad.Actions.LinkWorkspaces
-import XMonad.Actions.EasyMotion (selectWindow)
+import XMonad.Actions.EasyMotion 
+import XMonad.Actions.Promote
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.Util.Paste as XP
 
@@ -122,6 +123,15 @@ xpfont = "SourceCodePro-9:style=Bold"
 xpconf :: XPConfig
 xpconf = def { bgColor = "#000000", font = "xft:" ++ xpfont }
 
+emconf :: EasyMotionConfig
+emconf = def {
+    txtCol = "#A6200A"
+  , cancelKey = xK_Escape
+  , emFont = "xft:SourceCodePro-35:style=Bold"
+  , sKeys = AnyKeys [xK_a, xK_s, xK_d, xK_f, xK_g, xK_h, xK_j, xK_k, xK_l]
+  , overlayF = textSize
+}
+
 -- keybindings given in Emacs format for Utils.EZConfig
 keysSourceP myTerminal terminalWrapper myModMask = [
         -- Move windows across workspaces
@@ -130,7 +140,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-S-f", tagToEmptyWorkspace)
 
         -- move windows inside the current workspace
-      , ("M-d", windows W.swapMaster) -- swap window with the master window
+      , ("M-d", promote) -- swap window with the master window
       , ("M-<Return>", windows W.swapMaster) -- swap window with the master window
       , ("M-i", rotAllDown) -- rotate the windows in the current workspace
       , ("M-o", rotAllUp) -- rotate the windows in the current workspace
@@ -168,8 +178,8 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-S-m", refresh)
 
         -- EasyMotion
-      , ("M-h", selectWindow def >>= (`whenJust` windows . W.focusWindow))
-      , ("M-S-x", selectWindow def >>= (`whenJust` windows . W.focusWindow))
+      , ("M-h", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
+      , ("M-S-x", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
 
         -- switching workspaces
       , ("M-<Tab>", cycleWS' myModMask)
@@ -204,11 +214,27 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       -- , ("M-S-v", removeAllMatchings message)
       ]
 
+-- combination of W.shift and W.view to enable moving windows to other screens while keeping them focused
+shiftAndView :: WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail
+shiftAndView i s1 = W.view i s2 
+    where
+        s2 = W.shift i s1
+
+-- move the currently focused workspace to the screen at which the workspace given by WorkspaceId currently is
+-- used to implement workspace to screen movements
+moveWStoScreen :: WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail
+moveWStoScreen i s1 = W.greedyView current s2 
+    where
+        s2 = W.view i s1
+        current = W.currentTag s1
+
+
+
 -- keybindings generated as list comprehensions
 keysSource myModMask = 
       [((m .|. myModMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask)]]
+        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask)]]
       ++ 
       [((m .|. myModMask, k), windows $ f i)
         | (i, k) <- zip (myWorkspaces) [xK_1 .. xK_9]
@@ -282,11 +308,6 @@ cycleWS' :: KeyMask -> X()
 cycleWS' 8 = cycleWorkspaceOnCurrentScreen [xK_Alt_L] xK_Tab xK_n
 cycleWS' 64 = cycleWorkspaceOnCurrentScreen [xK_Super_L] xK_Tab xK_n
 
--- combination of W.shift and W.view to enable moving windows to other screens while keeping them focused
-shiftAndView :: WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail
-shiftAndView i s1 = W.view i s2 
-    where
-        s2 = W.shift i s1
 
 -- define the projects to have some default workspaces at hand
 --projects :: ([Char] -> [Char] -> [Char]) -> [Project]

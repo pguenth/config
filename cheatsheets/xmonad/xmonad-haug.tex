@@ -154,7 +154,17 @@
     \draw [densely dotted] ++(\X,\Y+0.5\base) -- +(\base,0);
     \setlength{\X}{\X + \base + \sep}
 }
-\def\keydd#1#2,#3#4,#5#6 {
+\def\keydd#1#2,#3#4,#5#6,#7#8#9 {
+    \begin{scope}
+        \clip [] ++(\X, \Y) rectangle ++(\base, \base);
+        \fill [#7, rounded corners=0] (\X,\Y)
+          rectangle +(\base, 0.33\base); 
+        \fill [#8, rounded corners=0] (\X,\Y + 0.33\base)
+          rectangle +(\base, 0.34\base);
+        \fill [#9, rounded corners=0] (\X,\Y + 0.67\base)
+          rectangle +(\base, 0.33\base);
+    \end{scope}
+
     \draw ++(\X,\Y) rectangle +(\base,\base)
            +(0.47\base,0.88\base)   node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
            +(0.47\base,0.53\base)       node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
@@ -289,10 +299,10 @@
     % upper row
     \X=0\unit
     \longfkeydd      (2\base - \unit) {Tab}{cycle focus forwards}{cycle recent WS},{groupSwitchWindows}{groupWS}
-    \keyd           Q{move window to S1},q{go to S1},{groupMoveWindows}{groupScreens}
-    \keyd           W{move window to S2},w{go to S2},{groupMoveWindows}{groupScreens}
-    \keyd           E{move window to S3},e{go to S3},{groupMoveWindows}{groupScreens}
-    \keyd           R{move window to S4},r{go to S4},{groupMoveWindows}{groupScreens}
+    \keydd           {\textasciicircum Q}{move WS to S1},Q{move window to S1},q{go to S1},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
+    \keydd           {\textasciicircum W}{move WS to S2},W{move window to S2},w{go to S2},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
+        \keydd          {\textasciicircum E}{move WS to S3},E{move window to S3},e{go to S3},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
+        \keydd          {\textasciicircum R}{move WS to S4},R{move window to S4},r{go to S4},{groupMoveWindows}{groupScreens}{groupSwitchWindows}
     \keyd          T{banish cursor},t{unfloat window},{white}{groupMoveWindows}
     \keyd           Y{quit XMonad},y{recompile XMonad},{white}{white}
     \keyd           U{},u{deactivate keybindings},{white}{white}

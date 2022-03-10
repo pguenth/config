@@ -467,8 +467,8 @@ nmap <Leader>w <Plug>(easymotion-overwin-w)
 let g:clever_f_show_prompt = 1
 let g:clever_f_smart_case = 1
 let g:clever_f_fix_key_direction = 1
-let g:clever_f_timeout_ms = 1000
-let g:clever_f_highlight_timeout_ms = 1000
+let g:clever_f_timeout_ms = 2000
+let g:clever_f_highlight_timeout_ms = 2000
 let g:clever_f_chars_match_any_signs = ';'
 " nmap ; <Plug>(clever-f-reset)
 

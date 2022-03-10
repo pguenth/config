@@ -16,6 +16,7 @@ import qualified XMonad.StackSet as W
 import XMonad.Util.EZConfig
 import XMonad.Util.Ungrab
 import XMonad.Util.WorkspaceCompare
+import XMonad.Util.NamedScratchpad
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
@@ -51,6 +52,7 @@ import XMonad.Actions.DynamicWorkspaceGroups
 import XMonad.Actions.LinkWorkspaces
 import XMonad.Actions.EasyMotion 
 import XMonad.Actions.Promote
+import XMonad.Hooks.InsertPosition
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.Util.Paste as XP
 
@@ -132,6 +134,11 @@ emconf = def {
   , overlayF = textSize
 }
 
+-- example scratchpad, I dont really use it
+scratchpads terminalWrapper = [
+    NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") defaultFloating 
+   ]
+
 -- keybindings given in Emacs format for Utils.EZConfig
 keysSourceP myTerminal terminalWrapper myModMask = [
         -- Move windows across workspaces
@@ -209,6 +216,8 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-S-d", sendMessage $ JumpToLayout "0A")
       , ("M-t", withFocused $ windows . W.sink )
 
+      , ("M-S-u", namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
+
       -- keybindings for LinkWorkspaces
       -- , ("M-S-b", toggleLinkWorkspaces message)
       -- , ("M-S-v", removeAllMatchings message)
@@ -271,7 +280,7 @@ myConfig myModMask myTerminal terminalWrapper = def
     , normalBorderColor = "#000000"
     , borderWidth = 1
     , layoutHook = myLayoutHook'
-    , manageHook = myManageHook
+    , manageHook = namedScratchpadManageHook (scratchpads terminalWrapper) <+> insertPosition Master Newer <+> myManageHook
     , focusFollowsMouse = True
     --, workspaces =  map show [1..9] -- project workspaces c and s are automatically added
     , terminal = myTerminal
@@ -338,8 +347,7 @@ cycleWS' 64 = cycleWorkspaceOnCurrentScreen [xK_Super_L] xK_Tab xK_n
 -- automatically float dialogs, gimp, and telegram media viewer
 myManageHook :: ManageHook
 myManageHook = composeAll
-    [ className =? "Gimp" --> doFloat
-    , title =? "Media viewer" --> doFloat
+    [ title =? "Media viewer" --> doFloat
     , isDialog --> doFloat
     ]
 
@@ -435,8 +443,9 @@ fixedAccordionMessage (FixedAccordion factor) m = fmap resize (fromMessage m)
         resize Expand = FixedAccordion (factor + 1)
 
 -- xmobar config of the xmonad-related information
-myXmobarPP :: PP
-myXmobarPP = def
+myXmobarPP = filterOutWsPP ["NSP"] myXmobarPP'
+myXmobarPP' :: PP
+myXmobarPP' = def
       { ppSep             = red (" | ")
       , ppTitleSanitize   = ppWindow . xmobarStrip -- limit the window title to 50 characters
       , ppLayout          = yellow . wrap "" (red " | ")

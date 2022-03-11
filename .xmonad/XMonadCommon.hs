@@ -237,13 +237,11 @@ moveWStoScreen i s1 = W.greedyView current s2
         s2 = W.view i s1
         current = W.currentTag s1
 
-
-
 -- keybindings generated as list comprehensions
 keysSource myModMask = 
       [((m .|. myModMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
         | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask)]]
+        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask), (W.greedyView, controlMask .|. shiftMask)]]
       ++ 
       [((m .|. myModMask, k), windows $ f i)
         | (i, k) <- zip (myWorkspaces) [xK_1 .. xK_9]

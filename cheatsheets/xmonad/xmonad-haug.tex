@@ -17,6 +17,7 @@
 \usepackage[latin1]{inputenc}
 \usepackage{tikz}
 
+\usepackage{menukeys}
 \usepackage{color}
 \usepackage{colortbl}
 \usepackage{fontawesome}
@@ -88,6 +89,7 @@
 \newcommand{\shortcut}[1]{\texttt{#1}}
 
 \newcommand{\keyname}[1]{{\color{keyname}\textbf{\footnotesize#1}}}
+\newcommand{\keynameSmall}[1]{{\color{keyname}\textbf{\scriptsize#1}}}
 \newcommand{\keynameRed}[1]{{\color{keynameRed}\textbf{\footnotesize#1}}}
 \newcommand{\keydesc}[1]{
     \begin{spacing}{0.75}
@@ -166,12 +168,12 @@
     \end{scope}
 
     \draw ++(\X,\Y) rectangle +(\base,\base)
-           +(0.47\base,0.88\base)   node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(0.45\base,0.88\base)   node[text width=1cm,text height=1,anchor=north east,align=center] {\keynameSmall{#1}}
            +(0.47\base,0.53\base)       node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
            +(0.47\base,0.2\base)       node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#5}}
-           +(0.23\base,0.8\base) node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#2}}
-           +(0.23\base,0.47\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#4}}
-           +(0.23\base,0.13\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#6}};
+           +(0.18\base,0.8\base) node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#2}}
+           +(0.18\base,0.47\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#4}}
+           +(0.18\base,0.13\base)         node[text width=1.4cm,text height=1,text ragged,anchor=west] {\keydesc{#6}};
 
     \draw [densely dotted] ++(\X,\Y+0.67\base) -- +(\base,0);
     \draw [densely dotted] ++(\X,\Y+0.33\base) -- +(\base,0);
@@ -299,10 +301,11 @@
     % upper row
     \X=0\unit
     \longfkeydd      (2\base - \unit) {Tab}{cycle focus forwards}{cycle recent WS},{groupSwitchWindows}{groupWS}
-    \keydd           {\textasciicircum Q}{move WS to S1},Q{move window to S1},q{go to S1},{groupWS}{groupMoveWindows}{groupScreens}
-    \keydd           {\textasciicircum W}{move WS to S2},W{move window to S2},w{go to S2},{groupWS}{groupMoveWindows}{groupScreens}
-    \keydd          {\textasciicircum E}{move WS to S3},E{move window to S3},e{go to S3},{groupWS}{groupMoveWindows}{groupScreens}
-        \keydd          {\textasciicircum R}{move WS to S4},R{move window to S4},r{go to S4},{groupWS}{groupMoveWindows}{groupScreens}
+    \keydd           {\textasciicircum Q}{move~WS~to (\shift~from)~S1},Q{move window to S1},q{go to S1},{groupWS}{groupMoveWindows}{groupScreens}
+
+    \keydd           {\textasciicircum W}{move~WS~to (\shift~from)~S2},W{move window to S2},w{go to S2},{groupWS}{groupMoveWindows}{groupScreens}
+    \keydd          {\textasciicircum E}{move~WS~to (\shift~from)~S3},E{move window to S3},e{go to S3},{groupWS}{groupMoveWindows}{groupScreens}
+        \keydd          {\textasciicircum R}{move~WS~to (\shift~from)~S4},R{move window to S4},r{go to S4},{groupWS}{groupMoveWindows}{groupScreens}
     \keyd          T{banish cursor},t{unfloat window},{white}{groupMoveWindows}
     \keyd           Y{quit XMonad},y{recompile XMonad},{white}{white}
     \keyd           U{},u{deactivate keybindings},{white}{white}

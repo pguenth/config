@@ -125,6 +125,8 @@ def _print_help():
     print("")
     print("Abbreviations:")
     print("    Use the dict 'abbrevs' to add abbreviations which are automatically expanded.")
+    for abbr, expanded in abbrevs.items():
+        print("    {} -> {}".format(abbr, expanded))
     
 
 aliases['h'] = _print_help
@@ -136,17 +138,23 @@ aliases['sharevnc2'] = 'bash -c "export DISPLAY=:0; x0vncserver -rfbauth ~/.vnc/
 aliases['sharevnc'] = 'x11vnc -display :0'
 aliases['setfbres'] = lambda args: $(xrandr --fb @(str(args[0]) + 'x' + str(args[1])))
 aliases['sshkeycheck'] = lambda args: $(cat @($HOME + "/.ssh/known_hosts") | grep @(args[0]) | ssh-keygen -lf -)
+# "
 aliases['sshkeyshow'] = lambda args: $(ssh -o VisualHostKey=yes -fN @(args[0]))
 aliases['lsb'] = lambda args: $(echo @(args[0]) > /sys/class/backlight/intel_backlight/brightness)
 aliases['bfp'] = 'python ~/coding/bfp/dialog.py'
 aliases['startvnc'] = 'killall ssh; ssh -fNL 9901:localhost:5901 trspofsuwz5ecp88.myfritz.net -p 54843; vncviewer localhost:9901'
 
-abbrevs['sd'] = 'sudo systemctl'
-abbrevs['sdon'] = 'sudo systemctl start'
-abbrevs['sdoff'] = 'sudo systemctl stop'
-abbrevs['na'] = 'netctl-auto@wlp2s0.service'
-abbrevs['nadown'] = 'sudo systemctl stop netctl-auto@wlp2s0.service'
-abbrevs['naup'] = 'sudo systemctl start netctl-auto@wlp2s0.service'
-abbrevs['nctlup'] = 'sudo netctl start wlp2s0-'
-abbrevs['nctldown'] = 'sudo netctl stop wlp2s0-'
+abbrevs['Pu'] = 'sudo pacman -Syu'
+abbrevs['PS'] = 'sudo pacman -S'
+abbrevs['PR'] = 'sudo pacman -R'
+abbrevs['S'] = 'sudo systemctl'
+abbrevs['Su'] = 'sudo systemctl start'
+abbrevs['Sd'] = 'sudo systemctl stop'
+abbrevs['Sr'] = 'sudo systemctl restart'
+abbrevs['Na'] = 'netctl-auto@wlp2s0.service'
+abbrevs['Nad'] = 'sudo systemctl stop netctl-auto@wlp2s0.service'
+abbrevs['Nau'] = 'sudo systemctl start netctl-auto@wlp2s0.service'
+abbrevs['Nu'] = 'sudo netctl start wlp2s0-'
+abbrevs['Nd'] = 'sudo netctl stop wlp2s0-'
 abbrevs['py'] = 'python'
+abbrevs['yt'] = 'youtube-dl'

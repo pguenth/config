@@ -46,6 +46,7 @@ set wildmenu		" display completion matches in a status line
 
 set ttimeout		" time out for key codes
 set ttimeoutlen=100	" wait up to 100ms after Esc for special key
+set timeoutlen=280
 
 " Show @@@ in the last line if it is truncated.
 set display=truncate
@@ -152,7 +153,7 @@ set number
 set expandtab
 
 set encoding=utf-8
-set clipboard=unnamedplus
+"set clipboard=unnamedplus
 
 " Remap pane switching
 nnoremap <C-J> <C-W><C-J>
@@ -173,7 +174,7 @@ let mapleader = " "
 " Settings for preservim/tagbar plugin
 set shell=/usr/bin/bash
 nmap <leader>t :TagbarToggle<CR>
-nmap <leader>T :TagbarTogglePause<CR>
+nmap <leader>r :TagbarTogglePause<CR>
 let g:tagbar_show_data_type=1
 
 set ssop-=options    " do not store global and local values in a session
@@ -450,14 +451,19 @@ endfunction
 " one character jump
 map <Leader>d <Plug>(easymotion-bd-f)
 nmap <Leader>d <Plug>(easymotion-overwin-f)
-" 2 character jump
+" 2 character jump, move substitute from s to S
+nnoremap S s
 nmap s <Plug>(easymotion-overwin-f2)
+" this works but somehow conceal is automatically resetted...
+"nmap s :call ConcealToggle() <CR> <bar> <Plug>(easymotion-overwin-f2)
+"<bar> <Plug>(easymotion-overwin-f2)
 " Lines
 map <Leader>l <Plug>(easymotion-bd-jk)
 nmap <Leader>l <Plug>(easymotion-overwin-line)
 " Words
 map <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
+"
 " Sneak versions (replaced by clever-f)
 " nmap f <Plug>Sneak_f
 " nmap F <Plug>Sneak_F
@@ -471,6 +477,9 @@ let g:clever_f_timeout_ms = 2000
 let g:clever_f_highlight_timeout_ms = 2000
 let g:clever_f_chars_match_any_signs = ';'
 " nmap ; <Plug>(clever-f-reset)
+"clever-f repeats
+map ; <Plug>(clever-f-repeat-forward)
+map , <Plug>(clever-f-repeat-back)
 
 " Vimtex
 let g:vimtex_view_method = 'zathura'
@@ -512,3 +521,80 @@ let g:Tex_DefaultTargetFormat="pdf"
 " The following is relevant to make LaTeX rerun after biber if necessary: 
 " (include all formats for which re-running is to be enabled)
 let g:Tex_MultipleCompileFormats='pdf,dvi'
+
+" logical Y behaviour
+map Y y$
+
+" enable inserting a new line and staying in normal mode
+nnoremap oo o<Esc>k
+nnoremap OO O<Esc>j
+
+" c-h is backspace, c-m is enter, c-n is autocomplete
+" for the moment sacrifice down motion
+inoremap <C-j> <left>
+inoremap <C-k> <up>
+inoremap <C-l> <right>
+
+" switch up/down to visual movements for wrapped lines
+nnoremap j gj
+nnoremap gj j
+nnoremap k gk
+nnoremap gk k
+
+" move to the end of lin
+vmap <leader>e d$p
+
+" stop insert-left movement
+" this is from https://vim.fandom.com/wiki/Prevent_escape_from_moving_the_cursor_one_character_to_the_left
+"inoremap <silent> <Esc> <C-O>:stopinsert<CR>
+" remap version makes problems:
+"   - Delete does not work in insert mode (opens :marks<CR>:normal `)
+let CursorColumnI = 0 "the cursor column position in INSERT
+autocmd InsertEnter * let CursorColumnI = col('.')
+autocmd CursorMovedI * let CursorColumnI = col('.')
+autocmd InsertLeave * if col('.') != CursorColumnI | call cursor(0, col('.')+1) | endif
+
+" switch word motion
+nnoremap w W
+nnoremap W w
+nnoremap b B
+nnoremap B b
+nnoremap e E
+nnoremap E e
+
+" clipboard copy/paste
+nmap <leader>y "+y
+vmap <leader>y "+y
+nmap <leader>p "+p
+nmap <leader>yy "+yy
+nmap <leader>Y "+Y
+
+
+" tex snippets with vimtex
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'ee',
+      \ 'rhs' : '\begin{equation}',
+      \ 'wrapper' : 'vimtex#imaps#wrap_trivial'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'eE',
+      \ 'rhs' : '\end{equation}',
+      \ 'wrapper' : 'vimtex#imaps#wrap_trivial'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'th',
+      \ 'rhs' : '\theta'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'Th',
+      \ 'rhs' : '\Theta'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'qd',
+      \ 'rhs' : '\mathrm{d}'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'qR',
+      \ 'rhs' : '\mathbb{R}'
+      \})
+

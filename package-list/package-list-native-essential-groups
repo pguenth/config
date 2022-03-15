@@ -30,6 +30,7 @@ grub
 intel-ucode
 jupyter
 libdvdcss
+libreoffice-extension-texmaths
 libreoffice-fresh
 libtool
 linux
@@ -55,6 +56,7 @@ python-pip
 python-scipy
 ranger
 rsync
+scrot
 sshfs
 sudo
 syncthing

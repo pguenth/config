@@ -23,3 +23,4 @@ So far this should be in principle transferrable to every distribution. The pack
 
 Things that need to be configured otherwise:
  * `vpnc` /etc/vpnc/home.conf is not tracked by this repository
+ * plocate-updatedb.timer has to be enabled and optionally the timeout may be shortened

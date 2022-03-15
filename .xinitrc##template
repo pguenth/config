@@ -49,5 +49,8 @@ xinput set-prop "DLL079F:01 044E:120B" "libinput Tapping Enabled"
 #for f in $(find /etc/X11/xinit/xinitrc.d/ -type f).splitlines():
 #    @(f)
 
+# set keyboard rate
+xset r rate 200 30
+
 # start
 exec xmonad

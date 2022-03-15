@@ -37,6 +37,7 @@ intel-ucode
 josm
 jupyter
 libdvdcss
+libreoffice-extension-texmaths
 libreoffice-fresh
 libtool
 linux
@@ -67,6 +68,7 @@ qemu-arch-extra
 qmapshack
 ranger
 rsync
+scrot
 sshfs
 sudo
 syncthing

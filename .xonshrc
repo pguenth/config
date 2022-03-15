@@ -1,5 +1,6 @@
 # XONSH WEBCONFIG START
 $PROMPT = '{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{gitstatus: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET} '
+#'
 $XONSH_COLOR_STYLE = 'native'
 # XONSH WEBCONFIG END
 
@@ -147,10 +148,15 @@ aliases['startvnc'] = 'killall ssh; ssh -fNL 9901:localhost:5901 trspofsuwz5ecp8
 abbrevs['Pu'] = 'sudo pacman -Syu'
 abbrevs['PS'] = 'sudo pacman -S'
 abbrevs['PR'] = 'sudo pacman -R'
+abbrevs['PQs'] = 'pacman -Qs'
 abbrevs['S'] = 'sudo systemctl'
 abbrevs['Su'] = 'sudo systemctl start'
 abbrevs['Sd'] = 'sudo systemctl stop'
 abbrevs['Sr'] = 'sudo systemctl restart'
+abbrevs['Sen'] = 'sudo systemctl enable'
+abbrevs['Sdis'] = 'sudo systemctl disable'
+abbrevs['Ss'] = 'systemctl status'
+abbrevs['Sl'] = 'systemctl list-units'
 abbrevs['Na'] = 'netctl-auto@wlp2s0.service'
 abbrevs['Nad'] = 'sudo systemctl stop netctl-auto@wlp2s0.service'
 abbrevs['Nau'] = 'sudo systemctl start netctl-auto@wlp2s0.service'

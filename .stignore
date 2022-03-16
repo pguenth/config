@@ -1,6 +1,7 @@
 !/.password-store
 !/.gnupg
 !/.treetasks.xml
+!/.timewarrior
 
 // symlinks to enable syncthing to ignore the ignored directories
 // symlinks dont work (are not followed), ignoring those files for the moment

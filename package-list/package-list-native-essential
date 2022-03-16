@@ -49,10 +49,12 @@ pipewire-v4l2
 pkgconf
 plocate
 python
+python-anytree
 python-beautifulsoup4
 python-matplotlib
 python-numpy
 python-pip
+pythin-psutil
 python-scipy
 ranger
 rsync
@@ -73,9 +75,10 @@ texlive-pictures
 texlive-pstricks
 texlive-publishers
 texlive-science
+tigervnc
+timew
 the_silver_searcher
 thunderbird
-tigervnc
 ttf-inconsolata
 ueberzug
 unzip

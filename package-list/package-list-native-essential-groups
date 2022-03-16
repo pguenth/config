@@ -49,10 +49,12 @@ pipewire-v4l2
 pkgconf
 plocate
 python
+python-anytree
 python-beautifulsoup4
 python-matplotlib
 python-numpy
 python-pip
+python-psutil
 python-scipy
 ranger
 rsync
@@ -62,9 +64,10 @@ sudo
 syncthing
 texinfo
 texlive-most
+tigervnc
+timew
 the_silver_searcher
 thunderbird
-tigervnc
 ttf-inconsolata
 ueberzug
 unzip

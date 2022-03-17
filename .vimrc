@@ -1,6 +1,5 @@
 " Modified by Patrick Günther
-"
-
+" The default file is largely extended
 
 " The default vimrc file.
 "
@@ -11,17 +10,6 @@
 " Except when Vim is run with "-u NONE" or "-C".
 " Individual settings can be reverted with ":set option&".
 " Other commands can be reverted as mentioned below.
-
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
-
-" Bail out if something that ran earlier, e.g. a system wide vimrc, does not
-" want Vim to use these default values.
-if exists('skip_defaults_vim')
-  finish
-endif
 
 " Use Vim settings, rather than Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
@@ -63,11 +51,6 @@ endif
 " Do not recognize octal numbers for Ctrl-A and Ctrl-X, most users find it
 " confusing.
 set nrformats-=octal
-
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries.
-if has('win32')
-  set guioptions-=t
-endif
 
 " Don't use Ex mode, use Q for formatting.
 " Revert with ":unmap Q".
@@ -138,12 +121,12 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
-if has('langmap') && exists('+langremap')
-  " Prevent that the langmap option applies to characters that result from a
-  " mapping.  If set (default), this may break plugins (but it's backward
-  " compatible).
-  set nolangremap
-endif
+" if has('langmap') && exists('+langremap')
+"   " Prevent that the langmap option applies to characters that result from a
+"   " mapping.  If set (default), this may break plugins (but it's backward
+"   " compatible).
+"   set nolangremap
+" endif
 
 " ****************
 " End of default config file

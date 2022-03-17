@@ -3,6 +3,16 @@ Readme for the files that are managed by [yadm](https://yadm.io/)
 
 This is the repository managing my configuration files for most applications I use on my typical Linux setup. Please don't consider the contents of this repository to be particularly well-thought or clean. Many things are evolved over time by compiling ideas or applying fixes found around the internet.
 
+Setup
+-----
+If you want to use my config and setup as is you need at least [yadm](https://yadm.io) installed.
+(You probably don't want that, I recommend taking inspirations from here and other similar repositories and building your own.)
+Clone this repository with `yadm clone` and checkout templated files with `yadm alt` and you are ready to go.
+Also check out the section *Things that need to be configured otherwise*.
+Some of the templated files are matched with the hostname of the machine running, which will probably not match yours.
+Watch out for these.
+You may also want to take close look at the package list because of course many tools are implied to exist on your system.
+
 The configuration of the following tools is managed
 ---------------------------------------------------
  * vim

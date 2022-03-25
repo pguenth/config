@@ -4,6 +4,7 @@
 
 env:
   TERM: xterm-256color
+  WINIT_X11_SCALE_FACTOR: "1"
 
 window:
   # Allow terminal applications to change Alacritty's window title.
@@ -30,7 +31,7 @@ font:
     style: Bold
 
 {% if yadm.hostname == "haugitude" %}
-  size: 6.5
+  size: 11
 {% endif %}
 
 {% if yadm.hostname == "gunnar" %}

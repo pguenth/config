@@ -308,9 +308,9 @@
         \keydd          {\textasciicircum R}{move~WS~to (\shift~from)~S4},R{move window to S4},r{go to S4},{groupWS}{groupMoveWindows}{groupScreens}
     \keyd          T{banish cursor},t{unfloat window},{white}{groupMoveWindows}
     \keyd           Y{quit XMonad},y{recompile XMonad},{white}{white}
-    \keyd           U{},u{deactivate keybindings},{white}{white}
-    \keyd          I{rotate windows CW (except focused)},i{rotate windows CW},{groupMoveWindows}{groupMoveWindows}
-    \keyd          O{rotate windows CCW (except focused)},o{rotate windows CCW},{groupMoveWindows}{groupMoveWindows}
+    \keyd           U{deactivate keybindings},u{},{white}{white}
+    \keyd          I{rotate windows CW (except focused)},i{rotate windows CCW},{groupMoveWindows}{groupMoveWindows}
+    \keyd          O{rotate windows CCW (except focused)},o{rotate windows CW},{groupMoveWindows}{groupMoveWindows}
     \keyd          P{gmrun},p{gmrun},{groupApplications}{groupApplications}
     \unusedkey           \{{},[{}
     \unusedkey           \}{},]{}
@@ -327,14 +327,14 @@
     \X=0\unit
     \longfkeydd (2\base) {Esc (remapped)}{ranger}{open terminal},{groupApplications}{groupApplications}
     \keyd          A{Tall layout},a{toggle fullscreen},{groupLayout}{groupLayout}
-    \keyd           S{Half-grid layout},s{toggle mirror},{groupLayout}{groupLayout}
+    \keyd           S{Half-grid layout},s{scratchpads},{groupLayout}{groupApplications}
     \keyd           D{Accordion layout},d{swap focused window with master},{groupLayout}{groupMoveWindows}
-    \keyd           F{move to next empty WS},f{go to next empty WS},{groupMoveWindows}{groupWS}
+    \keyd           F{move to next empty WS},f{toggle mirror},{groupMoveWindows}{groupLayout}
     \keyd           G{screenshot (selection)},g{screenshot (all)},{groupApplications}{groupApplications}
-    \keyd           H{decrease master pane},h{windows easy motion},{groupLayout}{groupSwitchWindows}
+    \keyd           H{decrease master pane},h{find open\\ window\\with dmenu},{groupLayout}{groupSwitchWindows}
     \keyd          J{cycle stack position\\CW},j{cycle focus forwards},{groupMoveWindows}{groupSwitchWindows}
     \keyd          K{cycle stack position\\CCW},k{cycle focus backwards},{groupMoveWindows}{groupSwitchWindows}
-    \keyd           L{increase master pane},l{find open\\ window\\with dmenu},{groupLayout}{groupSwitchWindows}
+    \keyd           L{increase master pane},l{windows easy motion},{groupLayout}{groupSwitchWindows}
     \unusedkey           :{},;{}
     \unusedkey           "{},'{}
     \longfkeydd      (2\base + \sep) {Enter}{open terminal}{swap focused window\\with master window},{groupApplications}{groupMoveWindows}
@@ -345,10 +345,10 @@
     \longfkeyd      (2\base + 2\sep) {Shift}{}{white}
     \keyd          Z{suspend},z{fewer win-\\dows in\\master pane},{groupApplications}{groupLayout}
     \keyd          X{windows easy motion},x{more win-\\dows in\\master pane},{groupSwitchWindows}{groupLayout}
-    \keyd           C{kill current window},c{open com-\\munication-related\\ applications},{groupApplications}{groupApplications}
+    \keyd           C{kill current window},c{go to next empty WS},{groupApplications}{groupWS}
     \keyd          V{toggle\\struts},v{open\\firefox},{groupLayout}{groupApplications}
-    \keyd           B{delete link},b{rename workspace},{groupWS}{groupWS}
-    \keyd           N{add to link},n{view link},{groupWS}{groupWS}
+    \keyd           B{add to link},b{view link},{groupWS}{groupWS}
+    \keyd           N{delete link},n{rename workspace},{groupWS}{groupWS}
     \keyd          M{refresh},m{focus master window},{white}{groupSwitchWindows}
     \keyd           {\textless}{},,{more windows in master pane},{white}{groupLayout}
     \keyd           {\textgreater},.{fewer windows in master pane},{white}{groupLayout}

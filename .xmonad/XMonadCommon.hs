@@ -52,6 +52,8 @@ import XMonad.Actions.DynamicWorkspaceGroups
 import XMonad.Actions.LinkWorkspaces
 import XMonad.Actions.EasyMotion 
 import XMonad.Actions.Promote
+import XMonad.Actions.PhysicalScreens
+import XMonad.Actions.Submap
 import XMonad.Hooks.InsertPosition
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.Util.Paste as XP
@@ -65,7 +67,7 @@ instance ExtensionClass KeysToggle where
 
 makeToggleable :: KeySym -> (XConfig Layout -> M.Map (KeyMask, KeySym) (X ())) -> XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 makeToggleable togSym origKeys conf =
-  M.insert (modMask conf, togSym) toggleKeys $ M.mapWithKey ifKeys (origKeys conf)
+  M.insert (modMask conf .|. shiftMask, togSym) toggleKeys $ M.mapWithKey ifKeys (origKeys conf)
   where
 
     ifKeys :: (KeyMask, KeySym) -> X () -> X ()
@@ -136,8 +138,9 @@ emconf = def {
 
 -- example scratchpad, I dont really use it
 scratchpads terminalWrapper = [
-    NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") defaultFloating 
-   ]
+        NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") defaultFloating
+      , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") defaultFloating 
+    ]
 
 -- keybindings given in Emacs format for Utils.EZConfig
 keysSourceP myTerminal terminalWrapper myModMask = [
@@ -149,8 +152,8 @@ keysSourceP myTerminal terminalWrapper myModMask = [
         -- move windows inside the current workspace
       , ("M-d", promote) -- swap window with the master window
       , ("M-<Return>", windows W.swapMaster) -- swap window with the master window
-      , ("M-i", rotAllDown) -- rotate the windows in the current workspace
-      , ("M-o", rotAllUp) -- rotate the windows in the current workspace
+      , ("M-o", rotAllDown) -- rotate the windows in the current workspace
+      , ("M-i", rotAllUp) -- rotate the windows in the current workspace
       --, ("M-S-s", rotAllDown) -- for one-handed access
       --, ("M-S-d", rotAllUp) -- for one-handed access
       , ("M-S-i", rotUnfocusedDown) -- rotate the unfocused windows 
@@ -185,22 +188,22 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-S-m", refresh)
 
         -- EasyMotion
-      , ("M-h", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
+      , ("M-l", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
       , ("M-S-x", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
 
         -- switching workspaces
       , ("M-<Tab>", cycleWS' myModMask)
       , ("M-S-<Tab>", windows W.focusDown)
-      , ("M-c", (sendMessage $ Toggle MYMIRROR) >> (multiSpawn ["telegram-desktop", "thunderbird", "element-desktop", terminalWrapper "Treetasks" "python /home/patrick/treetasks/treetasks.py"]))
-      , ("M-l", gotoMenuConfig $ def { menuArgs = ["-b", "-fn", xpfont, "-i"]} ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
-      , ("M-f", viewEmptyWorkspace)
-      , ("M-b", renameWorkspace xpconf )
+      --, ("M-c", (sendMessage $ Toggle MYMIRROR) >> (multiSpawn ["telegram-desktop", "thunderbird", "element-desktop", terminalWrapper "Treetasks" "python /home/patrick/treetasks/treetasks.py"]))
+      , ("M-h", gotoMenuConfig $ def { menuArgs = ["-b", "-fn", xpfont, "-i"]} ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
+      , ("M-c", viewEmptyWorkspace)
+      , ("M-n", renameWorkspace xpconf )
       , ("M-S-v", sendMessage ToggleStruts)
 
       -- DynamicWorkspaceGroups
-      , ("M-S-b", promptWSGroupForget xpconf "Forget ")
-      , ("M-S-n", promptWSGroupAdd xpconf "Add to ")
-      , ("M-n", promptWSGroupView xpconf "Go to ")
+      , ("M-S-n", promptWSGroupForget xpconf "Forget ")
+      , ("M-S-b", promptWSGroupAdd xpconf "Add to ")
+      , ("M-b", promptWSGroupView xpconf "Go to ")
 
         -- changing layout properties
       , ("M-S-h", sendMessage Shrink) -- %! Shrink the master area
@@ -209,14 +212,19 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-z", sendMessage (IncMasterN 1))
       , ("M-.", sendMessage (IncMasterN (-1))) -- decrease/increase the number of windows in the master pane
       , ("M-,", sendMessage (IncMasterN 1))
-      , ("M-s", sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
+      , ("M-f", sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
       , ("M-a" , sendMessage $ Toggle MYFULL) -- toggle fullscreen layout
       , ("M-S-a", sendMessage $ JumpToLayout "0T")
       , ("M-S-s", sendMessage $ JumpToLayout "0G")
       , ("M-S-d", sendMessage $ JumpToLayout "0A")
       , ("M-t", withFocused $ windows . W.sink )
+      -- , ("M-s", submap $ submapOptionalModifier myModMask [ (xK_a, namedScratchpadAction (scratchpads terminalWrapper) "bpytop") ] )
+      , ("M-s", submap $ M.fromList [ 
+            ((myModMask, xK_a), namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
+          , ((myModMask, xK_s), namedScratchpadAction (scratchpads terminalWrapper) "term")
+        ])
 
-      , ("M-S-u", namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
+      , ("M-u", namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
 
       -- keybindings for LinkWorkspaces
       -- , ("M-S-b", toggleLinkWorkspaces message)
@@ -229,6 +237,10 @@ shiftAndView i s1 = W.view i s2
     where
         s2 = W.shift i s1
 
+-- for physicalScreens
+-- shiftAndViewPhys:: WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail
+shiftAndViewPhys comp physsc = sendToScreen comp physsc >> viewScreen comp physsc
+
 -- move the currently focused workspace to the screen at which the workspace given by WorkspaceId currently is
 -- used to implement workspace to screen movements
 moveWStoScreen :: WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail
@@ -237,11 +249,23 @@ moveWStoScreen i s1 = W.greedyView current s2
         s2 = W.view i s1
         current = W.currentTag s1
 
+--physScreenAction comp physsc f = (whenJust (get $ getScreen comp physsc) screenWorkspace ) >>= flip whenJust (windows . f)
+
+physScreenAction :: (WorkspaceId -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail -> W.StackSet WorkspaceId (Layout Window) Window ScreenId ScreenDetail) -> ScreenComparator -> PhysicalScreen -> X ()
+physScreenAction f comp physsc = do i <- getScreen comp physsc
+                                    whenJust i $ \s -> do
+                                      w <- screenWorkspace s
+                                      whenJust w $ windows . f
+
+moveWStoScreenPhys comp physsc = physScreenAction moveWStoScreen comp physsc 
+
 -- keybindings generated as list comprehensions
 keysSource myModMask = 
-      [((m .|. myModMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+-- w/o physicalScreens [((m .|. myModMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
+      [((m .|. myModMask, key), f def sc)
         | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
-        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask), (W.greedyView, controlMask .|. shiftMask)]]
+-- w/o physicalScreens        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask), (W.greedyView, controlMask .|. shiftMask)]]
+        , (f, m) <- [(viewScreen, 0), (shiftAndViewPhys, shiftMask), (physScreenAction moveWStoScreen, controlMask), (physScreenAction W.greedyView, controlMask .|. shiftMask)]]
       ++ 
       [((m .|. myModMask, k), windows $ f i)
         | (i, k) <- zip (myWorkspaces) [xK_1 .. xK_9]
@@ -269,6 +293,7 @@ myKeysP myTerminal terminalWrapper myModMask c = mkKeymap c $ keysSourceP myTerm
 myKeys myTerminal terminalWrapper myModMask = addKeys (myKeysP myTerminal terminalWrapper myModMask) (keysSource myModMask)
 
 -- make the keys toggleable (with xK_u) (from: https://www.reddit.com/r/xmonad/comments/8xrmki/is_there_a_way_to_temporarily_disable_keybindings/)
+-- the shiftMask is set in the definition of makeToggleable because I was lazy
 myToggleableKeys myTerminal terminalWrapper myModMask = makeToggleable xK_u $ myKeys myTerminal terminalWrapper myModMask
 
 -- the main config (as function to dynamically set the terminal-dependent stuff)
@@ -386,15 +411,17 @@ instance Transformer MyTransformers Window where
 myLayoutHook = id
     . mkToggle (NOBORDERS ?? MYFULL ?? EOT)
     . mkToggle (single MYMIRROR)
-    $ layoutTall ||| layoutGrid ||| layoutAccordion 
+    $ layoutTall ||| layoutGrid ||| layoutAccordion ||| layoutTallGrid ||| layoutTallAccordion
 
 myLayoutHook' = avoidStruts myLayoutHook
 
 
 -- define the used layouts
 layoutTall = rename "T" $ Tall layoutNMaster layoutDelta layoutRatio
-layoutGrid = rename "G" $ ifMax 1 Full ( multimastered layoutNMaster layoutDelta layoutRatio $ GridRatio layoutGridRatio )
+layoutGrid = rename "G" $ GridRatio layoutGridRatio
 layoutAccordion = rename "A" $ FixedAccordion 12
+layoutTallGrid = rename "Tg" $ ifMax 1 Full ( multimastered layoutNMaster layoutDelta layoutRatio $ layoutGrid )
+layoutTallAccordion = rename "Ta" $ ifMax 1 Full ( multimastered layoutNMaster layoutDelta layoutRatio $ layoutAccordion )
 
 rename s l = renamed [Replace $ "0" ++ s] l
 

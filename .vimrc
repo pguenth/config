@@ -509,8 +509,8 @@ let g:Tex_MultipleCompileFormats='pdf,dvi'
 map Y y$
 
 " enable inserting a new line and staying in normal mode
-nnoremap oo o<Esc>k
-nnoremap OO O<Esc>j
+nnoremap oo m`o<Esc>``
+nnoremap OO m`O<Esc>``
 
 " c-h is backspace, c-m is enter, c-n is autocomplete
 " for the moment sacrifice down motion

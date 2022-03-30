@@ -5,6 +5,7 @@ module XMonadCommon where
 
 import qualified Data.Map        as M
 import Data.Ratio
+import Data.List
 import System.Exit
 
 -- hiding ||| to use JumpToLayout
@@ -127,6 +128,8 @@ xpfont = "SourceCodePro-9:style=Bold"
 xpconf :: XPConfig
 xpconf = def { bgColor = "#000000", font = "xft:" ++ xpfont }
 
+dmenuArgs = ["-b", "-fn", xpfont, "-i"]
+
 emconf :: EasyMotionConfig
 emconf = def {
     txtCol = "#A6200A"
@@ -182,10 +185,10 @@ keysSourceP myTerminal terminalWrapper myModMask = [
         -- other things
       , ("M-<F4>", kill) -- enable usual Alt-F4 for killing 
       , ("M-y", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi") -- move recompile key to y to use q for something that is used more often
-      , ("M-S-y", io (exitWith ExitSuccess)) -- move exit key to shift-y to free up q
+      , ("M-S-y", submap $ M.fromList [ ((myModMask .|. shiftMask, xK_y), io (exitWith ExitSuccess)) ] ) -- move exit key to shift-y to free up q
       , ("M-<F5>", windowPrompt def Goto allWindows) -- not working...
-      , ("M-S-t", banish LowerLeft) -- move the cursor out of the way
-      , ("M-S-m", refresh)
+      -- , ("M-S-t", banish LowerLeft) -- move the cursor out of the way
+      , ("M-S-m", spawn "killall -SIGUSR1 xmobar")
 
         -- EasyMotion
       , ("M-l", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
@@ -195,7 +198,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-<Tab>", cycleWS' myModMask)
       , ("M-S-<Tab>", windows W.focusDown)
       --, ("M-c", (sendMessage $ Toggle MYMIRROR) >> (multiSpawn ["telegram-desktop", "thunderbird", "element-desktop", terminalWrapper "Treetasks" "python /home/patrick/treetasks/treetasks.py"]))
-      , ("M-h", gotoMenuConfig $ def { menuArgs = ["-b", "-fn", xpfont, "-i"]} ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
+      , ("M-h", gotoMenuConfig $ def { menuArgs = dmenuArgs } ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
       , ("M-c", viewEmptyWorkspace)
       , ("M-n", renameWorkspace xpconf )
       , ("M-S-v", sendMessage ToggleStruts)
@@ -224,7 +227,12 @@ keysSourceP myTerminal terminalWrapper myModMask = [
           , ((myModMask, xK_s), namedScratchpadAction (scratchpads terminalWrapper) "term")
         ])
 
-      , ("M-u", namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
+      -- select xinerama layouts stored in the default arandr directory (.screenlayout) using dmenu
+      -- if there is a script ".screenlayout/.sh" it will be run as a side effect on canceling dmenu
+      -- currently used to spawn arandr in that case
+      , ("M-u", spawn $ "bash -c .screenlayout/$(ls .screenlayout | rev | cut -c4- | rev | dmenu " ++ (intercalate " " dmenuArgs) ++ ").sh")
+      -- doesnt work, dont know why
+      , ("M-S-u", spawn $ "bash -c sudo netctl-auto switch-to $(ls /etc/netctl | dmenu " ++ (intercalate " " dmenuArgs) ++ ")")
 
       -- keybindings for LinkWorkspaces
       -- , ("M-S-b", toggleLinkWorkspaces message)
@@ -292,9 +300,9 @@ myKeysP myTerminal terminalWrapper myModMask c = mkKeymap c $ keysSourceP myTerm
 -- together in one function
 myKeys myTerminal terminalWrapper myModMask = addKeys (myKeysP myTerminal terminalWrapper myModMask) (keysSource myModMask)
 
--- make the keys toggleable (with xK_u) (from: https://www.reddit.com/r/xmonad/comments/8xrmki/is_there_a_way_to_temporarily_disable_keybindings/)
+-- make the keys toggleable (with shift + xK_t) (from: https://www.reddit.com/r/xmonad/comments/8xrmki/is_there_a_way_to_temporarily_disable_keybindings/)
 -- the shiftMask is set in the definition of makeToggleable because I was lazy
-myToggleableKeys myTerminal terminalWrapper myModMask = makeToggleable xK_u $ myKeys myTerminal terminalWrapper myModMask
+myToggleableKeys myTerminal terminalWrapper myModMask = makeToggleable xK_t $ myKeys myTerminal terminalWrapper myModMask
 
 -- the main config (as function to dynamically set the terminal-dependent stuff)
 myConfig myModMask myTerminal terminalWrapper = def

@@ -3,10 +3,16 @@ Readme for the files that are managed by [yadm](https://yadm.io/)
 
 This is the repository managing my configuration files for most applications I use on my typical Linux setup. Please don't consider the contents of this repository to be particularly well-thought or clean. Many things are evolved over time by compiling ideas or applying fixes found around the internet.
 
+Disclaimer
+----------
+You probably don't want to use this repository in the way I use it, i.e. by cloning it into my home directory with yadm.
+I recommend taking inspirations from here and other similar repositories and building your own.
+This repository and especially this file is also used to document some quirks and configuration details of my setup apart from configuration files in the home repository.
+Apart from the obvious advantage of tracking configuration files it is also intended as some kind of notepad/manual for myself to speed up the process of setting up a new machine.
+
 Setup
 -----
 If you want to use my config and setup as is you need at least [yadm](https://yadm.io) installed.
-(You probably don't want that, I recommend taking inspirations from here and other similar repositories and building your own.)
 Clone this repository with `yadm clone` and checkout templated files with `yadm alt` and you are ready to go.
 Also check out the section *Things that need to be configured otherwise*.
 Some of the templated files are matched with the hostname of the machine running, which will probably not match yours.
@@ -38,6 +44,7 @@ Things that need to be configured otherwise (to be extended)
 ------------------------------------------------------------
  * `vpnc` /etc/vpnc/home.conf is not tracked by this repository
  * plocate-updatedb.timer has to be enabled and optionally the timeout may be shortened. Its configuration `/etc/updatedb.conf` is not tracked by this repository.
+ * For using the DHCP servers which do not support DUID client ids (seems to be the case in my university) an alternative config file for dhcpcd is existing in `/etc/netctl/dhcpcd.conf/` which is used by some wired network configuration files with the `DhcpcdOptions` option in netctl.
 
 Features/details of the ranger setup used
 -----------------------------------------

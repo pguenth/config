@@ -18,6 +18,7 @@ import XMonad.Util.EZConfig
 import XMonad.Util.Ungrab
 import XMonad.Util.WorkspaceCompare
 import XMonad.Util.NamedScratchpad
+import XMonad.Util.Minimize
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
@@ -25,7 +26,7 @@ import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 import XMonad.Hooks.ManageDocks
 import XMonad.Layout.Grid
-import XMonad.Layout.Renamed
+import XMonad.Layout.Renamed as Renamed
 import XMonad.Layout.ThreeColumns
 import XMonad.Layout.IfMax
 import XMonad.Layout.PerWorkspace
@@ -34,6 +35,8 @@ import XMonad.Layout.MultiToggle.Instances
 import XMonad.Layout.MultiToggle
 import XMonad.Layout.Accordion
 import XMonad.Layout.Master
+import XMonad.Layout.Minimize
+import XMonad.Layout.BoringWindows as BW
 import XMonad.Prompt
 import XMonad.Prompt.Window
 import XMonad.Actions.SpawnOn
@@ -55,9 +58,16 @@ import XMonad.Actions.EasyMotion
 import XMonad.Actions.Promote
 import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.Submap
+import XMonad.Actions.DynamicWorkspaces (addHiddenWorkspace)
+import XMonad.Actions.Minimize
 import XMonad.Hooks.InsertPosition
+import XMonad.Hooks.RefocusLast 
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.Util.Paste as XP
+
+-- for scratchpad stuff
+import qualified Data.List.NonEmpty as NE
+import XMonad.Prelude (filterM, find, unless, when)
 
 
 --- https://www.reddit.com/r/xmonad/comments/8xrmki/is_there_a_way_to_temporarily_disable_keybindings/
@@ -139,10 +149,84 @@ emconf = def {
   , overlayF = textSize
 }
 
--- example scratchpad, I dont really use it
+findAllByName :: NamedScratchpads -> String -> NamedScratchpads
+findAllByName c s = filter ((s ==) . name) c
+
+shiftToNSP :: [WindowSpace] -> ((Window -> X ()) -> X ()) -> X ()
+shiftToNSP ws f = do
+    unless (any ((scratchpadWorkspaceTag ==) . W.tag) ws) $
+        addHiddenWorkspace scratchpadWorkspaceTag
+    f (windows . W.shiftWin scratchpadWorkspaceTag)
+
+shiftToNSPL' (w:ws) = do (windows . W.shiftWin "NSP") w  >> do shiftToNSPL' ws
+shiftToNSPL' [] = return ()
+
+shiftToNSP' ws = shiftToNSPL' $ NE.take (NE.length ws) ws
+
+noNonEmpty l = NE.take (NE.length l) l
+
+dialog text = spawn $ "xterm -e dialog --yesno '" ++ text ++ "' 10 50"
+
+compileWinNames (w:ws) = show w ++ "; " ++ compileWinNames ws
+compileWinNames [] = ""
+
+dialogWinNames :: [Char] -> [Window] -> X()
+dialogWinNames title ws = dialog $ title ++ compileWinNames ws
+
+compileSPNames (s:ss) = cmd s ++ "; " ++ compileSPNames ss
+compileSPNames [] = ""
+dialogSPs ss = dialog $ compileSPNames ss
+
+someNamedScratchpadActionS f runApp conf = withWindowSet $ \winSet -> do
+    let focusedWspWindows = maybe [] W.integrate (W.stack . W.workspace . W.current $ winSet)
+        allWindows        = W.allWindows winSet ++ (XS.gets minimizedStack)
+    matchingOnCurrent <- filterM (runQuery (query conf)) focusedWspWindows
+    matchingOnAll     <- filterM (runQuery (query conf)) allWindows
+    dialog $ cmd conf
+    dialogWinNames "all" allWindows
+    dialogWinNames "cur" matchingOnCurrent
+    case NE.nonEmpty matchingOnCurrent of
+        -- no matching window on the current workspace -> scratchpad not running or in background
+        Nothing -> case NE.nonEmpty matchingOnAll of
+            Just wins -> doMap maximizeWindow (noNonEmpty wins) >> dialog "max"-- f (windows . W.shiftWin (W.currentTag winSet)) wins >> dialog "fetch"
+            Nothing   -> runApp conf >> dialog "run"
+
+        -- matching window running on current workspace -> window should be shifted to scratchpad workspace
+        Just wins ->  doMap minimizeWindow (noNonEmpty wins) >> dialog "min" -- shiftToNSP (W.workspaces winSet) (`f` wins) >> dialog "shift nsp"
+
+
+doMap :: (a -> X ()) -> [a] -> X()
+doMap f (x:xs) = f x >> doMap f xs
+doMap f [] = return ()
+
+namedConcat (x:xs) = x >> namedConcat xs
+namedConcat (x:[]) = x
+
+someNamedScratchpadAction' :: ((Window -> X ()) -> NE.NonEmpty Window -> X ())
+                          -> (NamedScratchpad -> X ())
+                          -> NamedScratchpads
+                          -> String
+                          -> X ()
+
+someNamedScratchpadAction' f runApp scratchpadConfig scratchpadName =
+    case findAllByName scratchpadConfig scratchpadName of
+        [] -> dialog "ret" --return ()
+        confs -> namedConcat ( map (someNamedScratchpadActionS f runApp) confs ) -- >> dialog "did all"
+
+namedScratchpadAction' = someNamedScratchpadAction' (\f ws -> f $ NE.head ws) (spawn . cmd)
+
+-- scratchpads
+scratchpadPadding = 1/20
+scratchpadSize = 1 - 2 * scratchpadPadding
+scratchpadLayout = customFloating $ W.RationalRect scratchpadPadding scratchpadPadding scratchpadSize scratchpadSize
+scratchpadLayoutHalfL = customFloating $ W.RationalRect scratchpadPadding (1/2) scratchpadSize (1/2 - scratchpadPadding)
+scratchpadLayoutHalfR = customFloating $ W.RationalRect (1/2) scratchpadPadding scratchpadSize (1/2 - scratchpadPadding)
 scratchpads terminalWrapper = [
-        NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") defaultFloating
-      , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") defaultFloating 
+        NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") scratchpadLayout
+      , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") scratchpadLayout
+      , NS "telegram" "element-desktop" (className =? "Element") scratchpadLayoutHalfR
+      , NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") scratchpadLayoutHalfL
+      , NS "thunderbird" "thunderbird" (className =? "Thunderbird") scratchpadLayout
     ]
 
 -- keybindings given in Emacs format for Utils.EZConfig
@@ -165,9 +249,9 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-S-k", windows W.swapUp) -- swap window with the master window
 
         -- move foxus
-      , ("M-j", windows W.focusDown) -- swap window with the master window
-      , ("M-k", windows W.focusUp) -- swap window with the master window
-      , ("M-m", windows W.focusMaster) -- swap window with the master window
+      , ("M-j", focusUp) --windows W.focusDown) -- swap window with the master window
+      , ("M-k", focusDown) --windows W.focusUp) -- swap window with the master window
+      , ("M-m", focusMaster) --windows W.focusMaster) -- swap window with the master window
 
         -- spawn applications
       , ("M-S-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot -s " )    ) -- screenshot (selection)
@@ -223,8 +307,11 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-t", withFocused $ windows . W.sink )
       -- , ("M-s", submap $ submapOptionalModifier myModMask [ (xK_a, namedScratchpadAction (scratchpads terminalWrapper) "bpytop") ] )
       , ("M-s", submap $ M.fromList [ 
-            ((myModMask, xK_a), namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
-          , ((myModMask, xK_s), namedScratchpadAction (scratchpads terminalWrapper) "term")
+            ((myModMask, xK_a), namedScratchpadAction' (scratchpads terminalWrapper) "bpytop")
+          , ((myModMask, xK_s), namedScratchpadAction' (scratchpads terminalWrapper) "term")
+          , ((myModMask, xK_d), namedScratchpadAction' (scratchpads terminalWrapper) "thunderbird")
+          , ((myModMask, xK_f), namedScratchpadAction' (scratchpads terminalWrapper) "telegram")
+          , ((myModMask, xK_j), windows $ W.greedyView "NSP")
         ])
 
       -- select xinerama layouts stored in the default arandr directory (.screenlayout) using dmenu
@@ -315,7 +402,8 @@ myConfig myModMask myTerminal terminalWrapper = def
     , focusFollowsMouse = True
     --, workspaces =  map show [1..9] -- project workspaces c and s are automatically added
     , terminal = myTerminal
-    , logHook = updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHook -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
+    -- >> nsHideOnFocusLoss (scratchpads terminalWrapper)
+    , logHook = refocusLastLogHook  >> updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHook -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
     , keys = myToggleableKeys myTerminal terminalWrapper myModMask
     }
 
@@ -412,7 +500,7 @@ data MyTransformers = MYFULL
     deriving (Read, Show, Eq, Typeable)
 
 instance Transformer MyTransformers Window where
-    transform MYFULL x k = k (renamed [Replace layoutDescrFS] Full) (const x)
+    transform MYFULL x k = k (renamed [Renamed.Replace layoutDescrFS] Full) (const x)
     transform MYMIRROR x k = k (renamed [CutWordsLeft 1, CutLeft 1, Prepend layoutDescrPrefixMirror] (Mirror x)) (const x) 
 
 -- layout hook, enables MultiToggle of fullscreen and mirroring and defines the used base layouts
@@ -421,7 +509,7 @@ myLayoutHook = id
     . mkToggle (single MYMIRROR)
     $ layoutTall ||| layoutGrid ||| layoutAccordion ||| layoutTallGrid ||| layoutTallAccordion
 
-myLayoutHook' = avoidStruts myLayoutHook
+myLayoutHook' = minimize . BW.boringWindows $ avoidStruts myLayoutHook
 
 
 -- define the used layouts
@@ -431,7 +519,7 @@ layoutAccordion = rename "A" $ FixedAccordion 12
 layoutTallGrid = rename "Tg" $ ifMax 1 Full ( multimastered layoutNMaster layoutDelta layoutRatio $ layoutGrid )
 layoutTallAccordion = rename "Ta" $ ifMax 1 Full ( multimastered layoutNMaster layoutDelta layoutRatio $ layoutAccordion )
 
-rename s l = renamed [Replace $ "0" ++ s] l
+rename s l = renamed [Renamed.Replace $ "0" ++ s] l
 
 -- old code to handle default layouts on the project workspaces, not really useful
     --
@@ -439,9 +527,9 @@ rename s l = renamed [Replace $ "0" ++ s] l
     --               onWorkspace workspaceTagSystem (myLayoutTall ||| myLayoutWide) $
     --               myLayoutGeneral
 
-    --myLayoutGeneral = myLayoutTall ||| myLayoutWide ||| renamed [Replace "F"] Full ||| renamed [Replace "G"] Grid
+    --myLayoutGeneral = myLayoutTall ||| myLayoutWide ||| renamed [Renamed.Replace "F"] Full ||| renamed [Renamed.Replace "G"] Grid
 
-    --myLayoutWide = renamed [Replace "H"] $ Mirror myLayoutTall
+    --myLayoutWide = renamed [Renamed.Replace "H"] $ Mirror myLayoutTall
 
 -- Custom Accordion
 

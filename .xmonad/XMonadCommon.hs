@@ -24,6 +24,7 @@ import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.RefocusLast (refocusLastLogHook)
 import XMonad.Layout.Grid
 import XMonad.Layout.Renamed
 import XMonad.Layout.ThreeColumns
@@ -139,11 +140,17 @@ emconf = def {
   , overlayF = textSize
 }
 
--- example scratchpad, I dont really use it
+scratchpadPadding = 1/20
+scratchpadSize = 1 - 2 * scratchpadPadding
+scratchpadLayout = customFloating $ W.RationalRect scratchpadPadding scratchpadPadding scratchpadSize scratchpadSize
 scratchpads terminalWrapper = [
-        NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") defaultFloating
-      , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") defaultFloating 
+        NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") scratchpadLayout
+      , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") scratchpadLayout
+      , NS "element" "element-desktop" (className =? "Element") scratchpadLayout
+      , NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") scratchpadLayout
+      , NS "thunderbird" "thunderbird" (className =? "Thunderbird") scratchpadLayout
     ]
+
 
 -- keybindings given in Emacs format for Utils.EZConfig
 keysSourceP myTerminal terminalWrapper myModMask = [
@@ -215,7 +222,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-z", sendMessage (IncMasterN 1))
       , ("M-.", sendMessage (IncMasterN (-1))) -- decrease/increase the number of windows in the master pane
       , ("M-,", sendMessage (IncMasterN 1))
-      , ("M-f", sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
+      , ("M-f", namedScratchpadAction (scratchpads terminalWrapper) "term")
       , ("M-a" , sendMessage $ Toggle MYFULL) -- toggle fullscreen layout
       , ("M-S-a", sendMessage $ JumpToLayout "0T")
       , ("M-S-s", sendMessage $ JumpToLayout "0G")
@@ -223,8 +230,11 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       , ("M-t", withFocused $ windows . W.sink )
       -- , ("M-s", submap $ submapOptionalModifier myModMask [ (xK_a, namedScratchpadAction (scratchpads terminalWrapper) "bpytop") ] )
       , ("M-s", submap $ M.fromList [ 
-            ((myModMask, xK_a), namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
-          , ((myModMask, xK_s), namedScratchpadAction (scratchpads terminalWrapper) "term")
+            ((myModMask, xK_t), namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
+          , ((myModMask, xK_s), sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
+          , ((myModMask, xK_a), namedScratchpadAction (scratchpads terminalWrapper) "thunderbird")
+          , ((myModMask, xK_d), namedScratchpadAction (scratchpads terminalWrapper) "element")
+          , ((myModMask, xK_f), namedScratchpadAction (scratchpads terminalWrapper) "telegram")
         ])
 
       -- select xinerama layouts stored in the default arandr directory (.screenlayout) using dmenu
@@ -315,7 +325,7 @@ myConfig myModMask myTerminal terminalWrapper = def
     , focusFollowsMouse = True
     --, workspaces =  map show [1..9] -- project workspaces c and s are automatically added
     , terminal = myTerminal
-    , logHook = updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHook -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
+    , logHook = refocusLastLogHook >> nsHideOnFocusLoss (scratchpads terminalWrapper) >> updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHook -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
     , keys = myToggleableKeys myTerminal terminalWrapper myModMask
     }
 

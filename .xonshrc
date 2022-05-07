@@ -2,6 +2,7 @@
 $PROMPT = '{env_name}{BOLD_GREEN}{user}@{hostname}{BOLD_BLUE} {cwd}{branch_color}{gitstatus: {}}{RESET} {BOLD_BLUE}{prompt_end}{RESET} '
 #'
 $XONSH_COLOR_STYLE = 'native'
+$XONSH_SHOW_TRACEBACK = True
 # XONSH WEBCONFIG END
 
 #if $TILIX_ID or $VTE_VERSION:
@@ -145,6 +146,11 @@ aliases['lsb'] = lambda args: $(echo @(args[0]) > /sys/class/backlight/intel_bac
 aliases['bfp'] = 'python ~/coding/bfp/dialog.py'
 aliases['startvnc'] = 'killall ssh; ssh -fNL 9901:localhost:5901 trspofsuwz5ecp88.myfritz.net -p 54843; vncviewer localhost:9901'
 
+# fix for xonsh 0.12.0, not required for 0.12.1 on
+# https://github.com/xonsh/xonsh/issues/4755
+import builtins
+builtins.abbrevs = __xonsh__.builtins.abbrevs
+
 abbrevs['Pu'] = 'sudo pacman -Syu'
 abbrevs['PS'] = 'sudo pacman -S'
 abbrevs['PR'] = 'sudo pacman -R'
@@ -166,4 +172,8 @@ abbrevs['Da'] = '/home/patrick/dock-control.sh add'
 abbrevs['Dr'] = '/home/patrick/dock-control.sh remove'
 abbrevs['py'] = 'python'
 abbrevs['yt'] = 'youtube-dl'
+abbrevs['G'] = '192.168.8.5'
+abbrevs['Vu'] = 'sudo systemctl start vpnc@home'
+abbrevs['Vd'] = 'sudo systemctl stop vpnc@home'
+abbrevs['Ndock'] = r'sudo systemctl start "netctl@dock\\x2ddhcp\\x2dnoclientid.service"'
 abbrevs['capella'] = 'pguenther@capella.astro.uni-wuerzburg.de'

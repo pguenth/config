@@ -338,6 +338,11 @@ Plug 'rhysd/clever-f.vim'
 "Plug 'tpope/vim-vividchalk'
 "Plug 'ts-26a/vim-darkspace'
 
+Plug 'mg979/vim-visual-multi'
+
+"highlight all search matches
+Plug 'qxxxb/vim-searchhi'
+"Plug 'PeterRincker/vim-searchlight'
 
 " Initialize plugin system
 call plug#end()
@@ -443,10 +448,10 @@ nmap s <Plug>(easymotion-overwin-f2)
 " Lines
 map <Leader>l <Plug>(easymotion-bd-jk)
 nmap <Leader>l <Plug>(easymotion-overwin-line)
-" Words
+" Words 
 map <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
-"
+" 
 " Sneak versions (replaced by clever-f)
 " nmap f <Plug>Sneak_f
 " nmap F <Plug>Sneak_F
@@ -581,3 +586,25 @@ call vimtex#imaps#add_map({
       \ 'rhs' : '\mathbb{R}'
       \})
 
+
+" searchhi mappings
+nmap n <Plug>(searchhi-n)
+nmap N <Plug>(searchhi-N)
+nmap * <Plug>(searchhi-*)
+nmap g* <Plug>(searchhi-g*)
+nmap # <Plug>(searchhi-#)
+nmap g# <Plug>(searchhi-g#)
+nmap gd <Plug>(searchhi-gd)
+nmap gD <Plug>(searchhi-gD)
+
+vmap n <Plug>(searchhi-v-n)
+vmap N <Plug>(searchhi-v-N)
+vmap * <Plug>(searchhi-v-*)
+vmap g* <Plug>(searchhi-v-g*)
+vmap # <Plug>(searchhi-v-#)
+vmap g# <Plug>(searchhi-v-g#)
+vmap gd <Plug>(searchhi-v-gd)
+vmap gD <Plug>(searchhi-v-gD)
+
+nmap <silent> <C-L> <Plug>(searchhi-clear-all)
+vmap <silent> <C-L> <Plug>(searchhi-v-clear-all)

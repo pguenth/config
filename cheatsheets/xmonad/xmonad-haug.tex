@@ -25,7 +25,7 @@
 \usepackage{tcolorbox}
 \usepackage{multicol}
 
-\usepackage[paperwidth=32.5cm, paperheight=22cm] {geometry}
+\usepackage[paperwidth=32.5cm, paperheight=28cm] {geometry}
 \geometry{top=2mm,bottom=0mm,left=-3mm,right=0mm}
 
 \usepackage[oldsyntax]{stackengine}
@@ -111,6 +111,11 @@
            +(0,0.85\base) node[text width=10cm,text height=1,anchor=north west] {\keyname{#1}\vspace{3px}\keydesc{#2}};
     \setlength{\X}{\X + \base + #3\sep}
 }
+\def\fkey#1#2#3 {
+    \draw[fill=#3] ++(\X,\Y)       rectangle +(\base,\base)
+           +(0,0.85\base) node[text width=10cm,text height=1,anchor=north west] {\keyname{#1}\vspace{3px}\keydesc{#2}};
+    \setlength{\X}{\X + \base + \sep}
+}
 \def\unusedfkey#1#2 { % the second argument is just to allow spaces before the first one
     \fill[very nearly transparent,gray]
          ++(\X,\Y) rectangle +(\base,\base);
@@ -155,6 +160,17 @@
 
     \draw [densely dotted] ++(\X,\Y+0.5\base) -- +(\base,0);
     \setlength{\X}{\X + \base + \sep}
+}
+\def\keydspace#1#2,#3#4,#5#6 {
+    \path[bicolor={#5 and #6}, draw=none] (\X,\Y) rectangle ++(\base, \base);
+    \draw ++(\X,\Y) rectangle +(\base,\base)
+           +(0.47\base,0.8\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#1}}
+           +(0.47\base,0.3\base) node[text width=1cm,text height=1,anchor=north east,align=center] {\keyname{#3}}
+           +(0.23\base,0.72\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#2}}
+           +(0.23\base,0.22\base) node[text width=1.4cm,text height=1,text ragged,anchor=west,align=left] {\keydesc{#4}};
+
+    \draw [densely dotted] ++(\X,\Y+0.5\base) -- +(\base,0);
+    \setlength{\X}{\X + \base + \frowsep\sep}
 }
 \def\keydd#1#2,#3#4,#5#6,#7#8#9 {
     \begin{scope}
@@ -252,16 +268,17 @@
     \newcommand{\frowsep}{6}
     \X=0\unit
     \pgfmathparse{2*\frowsep}
-    \keyd          {Esc}{ranger},{Esc}{terminal},{groupApplications}{groupApplications}
-    \unusedfkey           {F1}
-    \unusedfkey      {F2}
-    \unusedfkey           {F3}
+    \keydspace          {Esc}{ranger},{Esc}{terminal},{groupApplications}{groupApplications}
+    \fkey           {F1}{show\\application list}{groupApplications}
+    \fkey           {F2}{show\\ application grid}{groupApplications}
+    \fkey           {F3}{unfloat window}{groupMoveWindows}
     \fkeyd           {F4}{kill current\\window}{\frowsep}{groupApplications}
     
-    \unusedfkey           {F5}
-    \unusedfkey           {F6}
-    \unusedfkey           {F7}
-    \unusedfkey           {F8}{\frowsep}
+    \fkey           {F5}{deactivate\\ keybindings}{white}
+    \fkey           {F6}{toggle struts}{groupLayout}
+    \fkey           {F7}{recompile\\XMonad}{white}
+    \fkeyd           {F8}{quit XMonad\\(press 2x)}{\frowsep}{white}
+
     \unusedfkey      {F9}
     \unusedfkey           {F10}
     \unusedfkey      {F11}
@@ -305,12 +322,12 @@
 
     \keydd           {\textasciicircum W}{move~WS~to (\shift~from)~S2},W{move window to S2},w{go to S2},{groupWS}{groupMoveWindows}{groupScreens}
     \keydd          {\textasciicircum E}{move~WS~to (\shift~from)~S3},E{move window to S3},e{go to S3},{groupWS}{groupMoveWindows}{groupScreens}
-        \keydd          {\textasciicircum R}{move~WS~to (\shift~from)~S4},R{move window to S4},r{go to S4},{groupWS}{groupMoveWindows}{groupScreens}
-    \keyd          T{deactivate keybindings},t{unfloat window},{white}{groupMoveWindows}
-    \keyd           Y{quit XMonad\\(press 2x)},y{recompile XMonad},{white}{white}
+        \keyd          R{toggle mirror},r{scratchpad\\ranger},{groupLayout}{groupApplications}
+    \keyd          T{move to next empty WS},t{go to next empty WS},{groupMoveWindows}{groupWS}
+    \keyd           Y{},y{suspend},{white}{groupApplications}
     \keyd           U{switch\\networks},u{switch screenlayouts},{white}{white}
-    \keyd          I{rotate windows CW (except focused)},i{rotate windows CCW},{groupMoveWindows}{groupMoveWindows}
-    \keyd          O{rotate windows CCW (except focused)},o{rotate windows CW},{groupMoveWindows}{groupMoveWindows}
+    \keyd          I{rotate CW \\ (unfocused)},i{rotate windows CCW},{groupMoveWindows}{groupMoveWindows}
+    \keyd          O{rotate CCW \\ (unfocused)},o{rotate windows CW},{groupMoveWindows}{groupMoveWindows}
     \keyd          P{gmrun},p{gmrun},{groupApplications}{groupApplications}
     \unusedkey           \{{},[{}
     \unusedkey           \}{},]{}
@@ -326,11 +343,11 @@
     % home row
     \X=0\unit
     \longfkeydd (2\base) {Esc (remapped)}{ranger}{open terminal},{groupApplications}{groupApplications}
-    \keyd          A{Tall layout},a{toggle fullscreen},{groupLayout}{groupLayout}
-    \keyd           S{Half-grid layout},s{scratchpads},{groupLayout}{groupApplications}
+    \keyd          A{Tall layout (see below)},a{toggle fullscreen},{groupLayout}{groupLayout}
+    \keyd           S{Half-grid layout},s{scratchpads\\/ topic WS},{groupLayout}{groupApplications}
     \keyd           D{Accordion layout},d{swap focused window with master},{groupLayout}{groupMoveWindows}
-    \keyd           F{move to next empty WS},f{toggle mirror},{groupMoveWindows}{groupLayout}
-    \keyd           G{screenshot (selection)},g{screenshot (all)},{groupApplications}{groupApplications}
+    \keyd           F{windows easy motion},f{scratchpad\\ terminal},{groupSwitchWindows}{groupApplications}
+    \keyd           G{screenshot (all)},g{screenshot (selection)},{groupApplications}{groupApplications}
     \keyd           H{decrease master pane},h{find open\\ window\\with dmenu},{groupLayout}{groupSwitchWindows}
     \keyd          J{cycle stack position\\CW},j{cycle focus forwards},{groupMoveWindows}{groupSwitchWindows}
     \keyd          K{cycle stack position\\CCW},k{cycle focus backwards},{groupMoveWindows}{groupSwitchWindows}
@@ -343,10 +360,10 @@
     % lower row
     \X=0\unit
     \longfkeyd      (2\base + 2\sep) {Shift}{}{white}
-    \keyd          Z{suspend},z{fewer win-\\dows in\\master pane},{groupApplications}{groupLayout}
-    \keyd          X{windows easy motion},x{more win-\\dows in\\master pane},{groupSwitchWindows}{groupLayout}
-    \keyd           C{kill current window},c{go to next empty WS},{groupApplications}{groupWS}
-    \keyd          V{toggle\\struts},v{open\\firefox},{groupLayout}{groupApplications}
+    \keyd          Z{cycle stack position\\CW},z{cycle focus forwards},{groupMoveWindows}{groupSwitchWindows}
+    \keyd          X{cycle stack position\\CCW},x{cycle focus backwards},{groupMoveWindows}{groupSwitchWindows}
+    \keyd           C{kill current window},c{rotate CCW \\ (unfocused)},{groupApplications}{groupMoveWindows}
+    \keyd          V{},v{open\\firefox},{groupLayout}{groupApplications}
     \keyd           B{add to link},b{view link},{groupWS}{groupWS}
     \keyd           N{delete link},n{rename workspace},{groupWS}{groupWS}
     \keyd          M{move\\xmobar},m{focus master window},{white}{groupSwitchWindows}
@@ -429,12 +446,35 @@
       \end{itemize}
     }
 }
+\def\blockD{
+    \makeblock{7cm}{Tall Layout}{
+    There are three options available for the non-master pane of the tall layout, accessed by keychains starting with \shortcut{Mod-Shift-A}:
+      \begin{itemize}
+          \item \shortcut{+ Mod-Shift-A} The default way, stacking windows vertically
+          \item \shortcut{+ Mod-Shift-S} Use a grid
+          \item \shortcut{+ Mod-Shift-D} Use the accordion layout
+      \end{itemize}
+    }
+}
+\def\blockE{
+    \makeblock{10cm}{Scratchpads and special workspaces}{
+        There are scratchpads and workspaces preconfigured with \texttt{XMonad.Util.NamedScratchpads} and \texttt{XMonad.Actions.DynamicProjects}. The workspaces are hidden from xmobar and from the history when using \shortcut{Mod-Tab}.
+      \begin{itemize}
+          \item \shortcut{Mod-S + Mod-F} Messenger workspace, containing and autostarting Telegram and Element
+          \item \shortcut{Mod-S + Mod-A} Mail workspace, containing and autostarting Thunderbird
+          \item \shortcut{Mod-S + Mod-T} \texttt{bpytop} scratchpad, a system monitor
+          \item \shortcut{Mod-F} Scratchpad terminal
+          \item \shortcut{Mod-R} Scratchpad ranger, e.g. for opening files
+      \end{itemize}
+      Scratchpads are automatically hidden when they loose focus (on a designated workspace called NSP that one cannot normally see) and workspaces can be simply left with \shortcut{Mod-Tab} to go back to the last focused workspace.
+    }
+}
 
 \vspace{+2ex}
 \hspace{2ex}
 \scriptsize
-\Shortunderstack{ {\protect\blockC} }
-\Shortunderstack{ {\protect\blockA}  }
+\Shortunderstack{  {\protect\blockC} {\protect\blockD} }
+\Shortunderstack{ {\protect\blockA}   {\protect\blockE} }
 \hspace*{4ex}
 \Shortunderstack{ {\protect\blockB}  }
 %\Shortunderstack{ {\protect\blockK} }

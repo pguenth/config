@@ -6,10 +6,12 @@ module XMonadCommon where
 import qualified Data.Map        as M
 import Data.Ratio
 import Data.List
+import Data.IORef
 import System.Exit
 
 -- hiding ||| to use JumpToLayout
 import XMonad
+import XMonad.Prelude
 import XMonad.Operations
 import XMonad.Core
 import qualified XMonad.StackSet as W
@@ -20,7 +22,7 @@ import XMonad.Util.WorkspaceCompare
 import XMonad.Util.NamedScratchpad
 import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
+import XMonad.Hooks.WorkspaceHistory -- (workspaceHistoryHookExclude)
 import XMonad.Hooks.StatusBar
 import XMonad.Hooks.StatusBar.PP
 import XMonad.Hooks.ManageDocks
@@ -56,6 +58,7 @@ import XMonad.Actions.EasyMotion
 import XMonad.Actions.Promote
 import XMonad.Actions.PhysicalScreens
 import XMonad.Actions.Submap
+import XMonad.Actions.DynamicProjects
 import XMonad.Hooks.InsertPosition
 import qualified XMonad.Util.ExtensibleState as XS
 import qualified XMonad.Util.Paste as XP
@@ -69,7 +72,7 @@ instance ExtensionClass KeysToggle where
 
 makeToggleable :: KeySym -> (XConfig Layout -> M.Map (KeyMask, KeySym) (X ())) -> XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 makeToggleable togSym origKeys conf =
-  M.insert (modMask conf .|. shiftMask, togSym) toggleKeys $ M.mapWithKey ifKeys (origKeys conf)
+  M.insert (modMask conf, togSym) toggleKeys $ M.mapWithKey ifKeys (origKeys conf)
   where
 
     ifKeys :: (KeyMask, KeySym) -> X () -> X ()
@@ -85,21 +88,22 @@ makeToggleable togSym origKeys conf =
 
 -- main functions to be called from xmonad.hs
 mainDesktop :: IO()
-mainDesktop = xmonad . withSB mySBDesktop . workspaceNamesEwmh . ewmh . docks $ myConfigDesktop
+mainDesktop = xmonad . withSB mySBDesktop . workspaceNamesEwmh . ewmh . docks $ myProjectsDesktop
 mySBDesktop = statusBarProp "xmobar -x 1 ~/.xmobar/xmobar-desktop-0.config" (workspaceNamesPP myXmobarPP)
 
 mainLatitude :: IO()
-mainLatitude = xmonad . withSB mySBLatitude . workspaceNamesEwmh . ewmh . docks $ myConfigLatitude
-mySBLatitude = statusBarProp "xmobar -x 0 ~/.xmobar/xmobar-latitude.config" (workspaceNamesPP myXmobarPP)
+mainLatitude = xmonad . withSB mySBLatitude . workspaceNamesEwmh . ewmh . docks $ myProjectsLatitude
+mySBLatitude = statusBarProp "~/.local/bin/xmobar -x 0 ~/.xmobar/xmobar-latitude.config" (workspaceNamesPP myXmobarPP)
 
 mainThinkpad :: IO()
-mainThinkpad = xmonad . withSB (mySBThinkpad0 <> mySBThinkpad1) . workspaceNamesEwmh . ewmh . docks $ myConfigThinkpad
+mainThinkpad = xmonad . withSB (mySBThinkpad0 <> mySBThinkpad1) . workspaceNamesEwmh . ewmh . docks $ myProjectsThinkpad
 mySBThinkpad0 = statusBarProp "xmobar -x 0 /home/patrick/.xmobar/xmobar-thinkpad-0.config" (workspaceNamesPP myXmobarPP)
 mySBThinkpad1 = statusBarProp "xmobar -x 0 /home/patrick/.xmobar/xmobar-thinkpad-1.config" (workspaceNamesPP def) 
 
 -- projects = workspaces with default applications on them
---myProjectsDesktop = dynamicProjects (projects myTerminalWrapperDesktop) myConfigDesktop
---myProjectsThinkpad = dynamicProjects (projects myTerminalWrapperThinkpad) myConfigThinkpad
+myProjectsDesktop = dynamicProjects (projects myTerminalWrapperDesktop) myConfigDesktop
+myProjectsLatitude = dynamicProjects (projects myTerminalWrapperDesktop) myConfigLatitude
+myProjectsThinkpad = dynamicProjects (projects myTerminalWrapperThinkpad) myConfigThinkpad
 
 -- compile config for either desktop or thinkpad
 myConfigDesktop = myConfig mod1Mask myTerminalDesktop myTerminalWrapperDesktop 
@@ -146,10 +150,13 @@ scratchpadLayout = customFloating $ W.RationalRect scratchpadPadding scratchpadP
 scratchpads terminalWrapper = [
         NS "bpytop" (terminalWrapper "bpytop" "bpytop") (title =? "bpytop") scratchpadLayout
       , NS "term" (terminalWrapper "scratch-term" "xonsh") (title =? "scratch-term") scratchpadLayout
-      , NS "element" "element-desktop" (className =? "Element") scratchpadLayout
-      , NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") scratchpadLayout
-      , NS "thunderbird" "thunderbird" (className =? "Thunderbird") scratchpadLayout
+      , NS "ranger" (terminalWrapper "ranger-term" "ranger") (title =? "ranger-term") scratchpadLayout
+      --, NS "element" "element-desktop" (className =? "Element") scratchpadLayout
+      --, NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") scratchpadLayout
+      --, NS "thunderbird" "thunderbird" (className =? "Thunderbird") scratchpadLayout
     ]
+
+myHiddenWS = ["NSP"] ++ allProjectNames
 
 
 -- keybindings given in Emacs format for Utils.EZConfig
@@ -157,7 +164,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
         -- Move windows across workspaces
         ("M-`", shiftNextScreen >> nextScreen ) -- move applications to the next screen
       , ("M-S-`", shiftPrevScreen >> prevScreen ) -- move applications to the previous screen
-      , ("M-S-f", tagToEmptyWorkspace)
+      , ("M-S-t", tagToEmptyWorkspace)
 
         -- move windows inside the current workspace
       , ("M-d", promote) -- swap window with the master window
@@ -168,47 +175,53 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       --, ("M-S-d", rotAllUp) -- for one-handed access
       , ("M-S-i", rotUnfocusedDown) -- rotate the unfocused windows 
       , ("M-S-o", rotUnfocusedUp)  -- rotate the unfocused windows 
+      , ("M-c", rotUnfocusedUp)  -- rotate the unfocused windows 
       , ("M-S-j", windows W.swapDown) -- swap window with the master window
       , ("M-S-k", windows W.swapUp) -- swap window with the master window
+      , ("M-S-z", windows W.swapDown) -- swap window with the master window
+      , ("M-S-x", windows W.swapUp) -- swap window with the master window
 
         -- move foxus
       , ("M-j", windows W.focusDown) -- swap window with the master window
       , ("M-k", windows W.focusUp) -- swap window with the master window
+      , ("M-z", windows W.focusDown) -- swap window with the master window
+      , ("M-x", windows W.focusUp) -- swap window with the master window
       , ("M-m", windows W.focusMaster) -- swap window with the master window
 
         -- spawn applications
-      , ("M-S-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot -s " )    ) -- screenshot (selection)
-      , ("M-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot"     )) -- screenshot (whole screen)
-      , ("M-v", spawn "firefox") -- start firefox
+      , ("M-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot -s " )    ) -- screenshot (selection)
+      , ("M-S-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot"     )) -- screenshot (whole screen)
+      , ("M-v", spawn "firefkx") -- start firefox
       , ("M-<Space>", spawn "gmrun")
       , ("M-p", spawn "gmrun") -- gmrun instead of dmenu
       , ("M-S-p", spawn "gmrun")
       , ("M-S-c", kill)
-      , ("M-S-z", spawn "systemctl suspend") -- suspend
+      , ("M-y", spawn "systemctl suspend") -- suspend
       , ("M-<Escape>", spawn myTerminal) -- spawn a terminal
       , ("M-S-<Return>", spawn myTerminal) -- spawn a terminal
       , ("M-S-<Escape>", spawn $ terminalWrapper myFileManager myFileManager) -- spawn ranger
 
         -- other things
       , ("M-<F4>", kill) -- enable usual Alt-F4 for killing 
-      , ("M-y", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi") -- move recompile key to y to use q for something that is used more often
-      , ("M-S-y", submap $ M.fromList [ ((myModMask .|. shiftMask, xK_y), io (exitWith ExitSuccess)) ] ) -- move exit key to shift-y to free up q
-      , ("M-<F5>", windowPrompt def Goto allWindows) -- not working...
+      , ("M-<F7>", spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi") -- move recompile key to F7 to use q for something that is used more often
+      , ("M-<F8>", submap $ M.fromList [ ((myModMask, xK_F8), io (exitWith ExitSuccess)) ] ) -- move exit key to F8 to free up q
+      , ("M-<F1>", windowPrompt xpconf Goto allWindows) -- not working...
+      , ("M-<F2>", goToSelected def) 
       -- , ("M-S-t", banish LowerLeft) -- move the cursor out of the way
       , ("M-S-m", spawn "killall -SIGUSR1 xmobar")
 
         -- EasyMotion
       , ("M-l", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
-      , ("M-S-x", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
+      , ("M-S-f", selectWindow emconf >>= (`whenJust` windows . W.focusWindow))
 
         -- switching workspaces
       , ("M-<Tab>", cycleWS' myModMask)
       , ("M-S-<Tab>", windows W.focusDown)
       --, ("M-c", (sendMessage $ Toggle MYMIRROR) >> (multiSpawn ["telegram-desktop", "thunderbird", "element-desktop", terminalWrapper "Treetasks" "python /home/patrick/treetasks/treetasks.py"]))
       , ("M-h", gotoMenuConfig $ def { menuArgs = dmenuArgs } ) -- show dmenu to quickly move to a currently open window by title (WindowBringer)
-      , ("M-c", viewEmptyWorkspace)
+      , ("M-t", viewEmptyWorkspace)
       , ("M-n", renameWorkspace xpconf )
-      , ("M-S-v", sendMessage ToggleStruts)
+      , ("M-<F6>", sendMessage ToggleStruts)
 
       -- DynamicWorkspaceGroups
       , ("M-S-n", promptWSGroupForget xpconf "Forget ")
@@ -218,24 +231,28 @@ keysSourceP myTerminal terminalWrapper myModMask = [
         -- changing layout properties
       , ("M-S-h", sendMessage Shrink) -- %! Shrink the master area
       , ("M-S-l", sendMessage Expand) -- %! Expand the master area
-      , ("M-x", sendMessage (IncMasterN (-1))) -- decrease/increase the number of windows in the master pane
-      , ("M-z", sendMessage (IncMasterN 1))
+      --, ("M-x", sendMessage (IncMasterN (-1))) -- decrease/increase the number of windows in the master pane
+      --, ("M-z", sendMessage (IncMasterN 1))
       , ("M-.", sendMessage (IncMasterN (-1))) -- decrease/increase the number of windows in the master pane
       , ("M-,", sendMessage (IncMasterN 1))
       , ("M-f", namedScratchpadAction (scratchpads terminalWrapper) "term")
       , ("M-a" , sendMessage $ Toggle MYFULL) -- toggle fullscreen layout
-      , ("M-S-a", sendMessage $ JumpToLayout "0T")
+      , ("M-S-r", sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
+      , ("M-S-a", submap $ M.fromList [ 
+            ((myModMask .|. shiftMask, xK_a), sendMessage $ JumpToLayout "0T")
+          , ((myModMask .|. shiftMask, xK_s), sendMessage $ JumpToLayout "0Tg")
+          , ((myModMask .|. shiftMask, xK_d), sendMessage $ JumpToLayout "0Ta")
+        ])
       , ("M-S-s", sendMessage $ JumpToLayout "0G")
       , ("M-S-d", sendMessage $ JumpToLayout "0A")
-      , ("M-t", withFocused $ windows . W.sink )
+      , ("M-<F3>", withFocused $ windows . W.sink )
       -- , ("M-s", submap $ submapOptionalModifier myModMask [ (xK_a, namedScratchpadAction (scratchpads terminalWrapper) "bpytop") ] )
       , ("M-s", submap $ M.fromList [ 
             ((myModMask, xK_t), namedScratchpadAction (scratchpads terminalWrapper) "bpytop")
-          , ((myModMask, xK_s), sendMessage $ Toggle MYMIRROR) -- toggle mirrored layout
-          , ((myModMask, xK_a), namedScratchpadAction (scratchpads terminalWrapper) "thunderbird")
-          , ((myModMask, xK_d), namedScratchpadAction (scratchpads terminalWrapper) "element")
-          , ((myModMask, xK_f), namedScratchpadAction (scratchpads terminalWrapper) "telegram")
+          , ((myModMask, xK_a), switchProject $ projectMail terminalWrapper)
+          , ((myModMask, xK_f), switchProject $ projectMessenger terminalWrapper)
         ])
+      , ("M-r", namedScratchpadAction (scratchpads terminalWrapper) "ranger")
 
       -- select xinerama layouts stored in the default arandr directory (.screenlayout) using dmenu
       -- if there is a script ".screenlayout/.sh" it will be run as a side effect on canceling dmenu
@@ -281,7 +298,7 @@ moveWStoScreenPhys comp physsc = physScreenAction moveWStoScreen comp physsc
 keysSource myModMask = 
 -- w/o physicalScreens [((m .|. myModMask, key), screenWorkspace sc >>= flip whenJust (windows . f))
       [((m .|. myModMask, key), f def sc)
-        | (key, sc) <- zip [xK_q, xK_w, xK_e, xK_r] [0..]
+        | (key, sc) <- zip [xK_q, xK_w, xK_e] [0..]
 -- w/o physicalScreens        , (f, m) <- [(W.view, 0), (shiftAndView, shiftMask), (moveWStoScreen, controlMask), (W.greedyView, controlMask .|. shiftMask)]]
         , (f, m) <- [(viewScreen, 0), (shiftAndViewPhys, shiftMask), (physScreenAction moveWStoScreen, controlMask), (physScreenAction W.greedyView, controlMask .|. shiftMask)]]
       ++ 
@@ -311,8 +328,8 @@ myKeysP myTerminal terminalWrapper myModMask c = mkKeymap c $ keysSourceP myTerm
 myKeys myTerminal terminalWrapper myModMask = addKeys (myKeysP myTerminal terminalWrapper myModMask) (keysSource myModMask)
 
 -- make the keys toggleable (with shift + xK_t) (from: https://www.reddit.com/r/xmonad/comments/8xrmki/is_there_a_way_to_temporarily_disable_keybindings/)
--- the shiftMask is set in the definition of makeToggleable because I was lazy
-myToggleableKeys myTerminal terminalWrapper myModMask = makeToggleable xK_t $ myKeys myTerminal terminalWrapper myModMask
+-- (not at the moment:) the shiftMask is set in the definition of makeToggleable because I was lazy
+myToggleableKeys myTerminal terminalWrapper myModMask = makeToggleable xK_F5 $ myKeys myTerminal terminalWrapper myModMask
 
 -- the main config (as function to dynamically set the terminal-dependent stuff)
 myConfig myModMask myTerminal terminalWrapper = def
@@ -325,7 +342,7 @@ myConfig myModMask myTerminal terminalWrapper = def
     , focusFollowsMouse = True
     --, workspaces =  map show [1..9] -- project workspaces c and s are automatically added
     , terminal = myTerminal
-    , logHook = refocusLastLogHook >> nsHideOnFocusLoss (scratchpads terminalWrapper) >> updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHook -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
+    , logHook = refocusLastLogHook >> nsHideOnFocusLoss (scratchpads terminalWrapper) >> updatePointer (0.5, 0.5) (0, 0) >> workspaceHistoryHookExclude myHiddenWS -- move pointer to the center if a window is focused, historyHook for cycleWOrkspaceByScreen
     , keys = myToggleableKeys myTerminal terminalWrapper myModMask
     }
 
@@ -355,13 +372,60 @@ multiSpawn (x:[]) = spawn x
 -- cycle recent workspaces function call, bind to both the forward and backward keybinding
 -- cycleWS' = cycleWorkspaceOnCurrentScreen [xK_Alt_L, xK_Shift_L] xK_a xK_Escape
 cycleWS' :: KeyMask -> X()
-cycleWS' 8 = cycleWorkspaceOnCurrentScreen [xK_Alt_L] xK_Tab xK_n
-cycleWS' 64 = cycleWorkspaceOnCurrentScreen [xK_Super_L] xK_Tab xK_n
+cycleWS' 8 = cycleWorkspaceOnCurrentScreenExclude myHiddenWS [xK_Alt_L] xK_Tab xK_n
+cycleWS' 64 = cycleWorkspaceOnCurrentScreenExclude myHiddenWS [xK_Super_L] xK_Tab xK_n
 
+-- Check if the current workspace on screen ScreenId is in the given list
+isWSOnScreenHidden :: [WorkspaceId] -> ScreenId -> X (Bool)
+isWSOnScreenHidden hiddenWS screenId = do
+  currentWSId <- screenWorkspace screenId
+  return $ case currentWSId of
+    Just id -> if (elem id hiddenWS) then True else False
+    Nothing -> False 
+
+-- similar to cycleWorkspaceOnScreen from XMonad.Action.CycleWorkspaceByScreen
+-- but checks if the current workspace is in hiddenWS and if so goes back to the last recorded entry in the history hook
+-- instead of the second-last entry
+-- (the history hook is expected to ignore the same workspaces as the ones that are given here)
+cycleWorkspaceOnScreenExclude :: [WorkspaceId] -> ScreenId -> [KeySym] -> KeySym -> KeySym -> X ()
+cycleWorkspaceOnScreenExclude hiddenWS screenId mods nextKey prevKey = workspaceHistoryTransaction $ do
+  startingHistory <- workspaceHistoryByScreen
+  isHidden <- isWSOnScreenHidden hiddenWS screenId
+  let cycleWorkspaces = fromMaybe [] $ lookup screenId startingHistory
+  case isHidden of
+    True -> (windows . W.greedyView) $ head cycleWorkspaces
+    False -> cycleWorkspaceOnScreen screenId mods nextKey prevKey
+  return ()
+
+
+-- the following function is copied from 
+-- https://hackage.haskell.org/package/xmonad-contrib-0.17.0/docs/src/XMonad.Actions.CycleWorkspaceByScreen.html#cycleWorkspaceOnScreen
+-- and modified to use the *Exclude version above
+cycleWorkspaceOnCurrentScreenExclude :: [WorkspaceId] -> [KeySym] -> KeySym -> KeySym -> X ()
+cycleWorkspaceOnCurrentScreenExclude hiddenWS mods n p =
+  withWindowSet $ \ws ->
+    cycleWorkspaceOnScreenExclude hiddenWS (W.screen $ W.current ws) mods n p
 
 -- define the projects to have some default workspaces at hand
---projects :: ([Char] -> [Char] -> [Char]) -> [Project]
---projects terminalWrapper = [projectCommunication terminalWrapper, projectSystem terminalWrapper]
+projects :: ([Char] -> [Char] -> [Char]) -> [Project]
+projects terminalWrapper = sequence projectsUnwrapped terminalWrapper
+
+projectsUnwrapped = [projectMail, projectMessenger]
+
+projectMail terminalWrapper = Project { projectName = w
+   , projectDirectory = "/home/patrick"
+   , projectStartHook = Just $ do spawnOn w "thunderbird"
+} where w = "mail"
+
+projectMessenger terminalWrapper = Project { projectName = w
+   , projectDirectory = "/home/patrick"
+   , projectStartHook = Just $ do
+             spawnOn w "telegram-desktop"
+             spawnOn w "element-desktop"
+} where w = "messenger"
+
+allProjectNames :: [ProjectName]
+allProjectNames = fmap (\p -> projectName p) $ projects (\s -> (\s -> s))
 
 -- a project for communication applications
 --projectCommunication terminalWrapper = Project { projectName = w
@@ -486,7 +550,7 @@ fixedAccordionMessage (FixedAccordion factor) m = fmap resize (fromMessage m)
         resize Expand = FixedAccordion (factor + 1)
 
 -- xmobar config of the xmonad-related information
-myXmobarPP = filterOutWsPP ["NSP"] myXmobarPP'
+myXmobarPP = filterOutWsPP myHiddenWS myXmobarPP'
 myXmobarPP' :: PP
 myXmobarPP' = def
       { ppSep             = red (" | ")

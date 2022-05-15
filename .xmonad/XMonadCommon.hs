@@ -175,7 +175,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
       --, ("M-S-d", rotAllUp) -- for one-handed access
       , ("M-S-i", rotUnfocusedDown) -- rotate the unfocused windows 
       , ("M-S-o", rotUnfocusedUp)  -- rotate the unfocused windows 
-      , ("M-c", rotUnfocusedUp)  -- rotate the unfocused windows 
+      , ("M-c", windows W.focusMaster >> rotUnfocusedUp >> windows W.focusDown)  -- rotate the unfocused windows 
       , ("M-S-j", windows W.swapDown) -- swap window with the master window
       , ("M-S-k", windows W.swapUp) -- swap window with the master window
       , ("M-S-z", windows W.swapDown) -- swap window with the master window
@@ -191,7 +191,7 @@ keysSourceP myTerminal terminalWrapper myModMask = [
         -- spawn applications
       , ("M-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot -s " )    ) -- screenshot (selection)
       , ("M-S-g", unGrab *> (spawn $ "cd " ++ screenshotPath ++ "; scrot"     )) -- screenshot (whole screen)
-      , ("M-v", spawn "firefkx") -- start firefox
+      , ("M-v", spawn "firefox") -- start firefox
       , ("M-<Space>", spawn "gmrun")
       , ("M-p", spawn "gmrun") -- gmrun instead of dmenu
       , ("M-S-p", spawn "gmrun")
@@ -454,6 +454,9 @@ myManageHook :: ManageHook
 myManageHook = composeAll
     [ title =? "Media viewer" --> doFloat
     , isDialog --> doFloat
+
+    -- this fixes firefox developer console tooltips that show on hovering the circled 'i' when inspecting invalid CSS.
+    , isInProperty "_NET_WM_WINDOW_TYPE" "_NET_WM_WINDOW_TYPE_UTILITY" --> doIgnore 
     ]
 
 -- Get the name of the active layout.

@@ -471,7 +471,7 @@ map , <Plug>(clever-f-repeat-back)
 
 " Vimtex
 let g:vimtex_view_method = 'zathura'
-let g:vimtex_view_forward_search_on_start = 1
+let g:vimtex_view_forward_search_on_start = 0
 if empty(v:servername) && exists('*remote_startserver') && has('clientserver')
   call remote_startserver('VIM')
 endif
@@ -585,6 +585,30 @@ call vimtex#imaps#add_map({
       \ 'lhs' : 'qR',
       \ 'rhs' : '\mathbb{R}'
       \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'pp',
+      \ 'rhs' : '\partial'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'fp',
+      \ 'rhs' : '\frac{\partial}{\partial}'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'w',
+      \ 'rhs' : '\frac{\partial '
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'ww',
+      \ 'rhs' : '}{\partial '
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'o',
+      \ 'rhs' : '\omega'
+      \})
+call vimtex#imaps#add_map({
+      \ 'lhs' : 'O',
+      \ 'rhs' : '\Omega'
+      \})
 
 
 " searchhi mappings
@@ -606,5 +630,5 @@ vmap g# <Plug>(searchhi-v-g#)
 vmap gd <Plug>(searchhi-v-gd)
 vmap gD <Plug>(searchhi-v-gD)
 
-nmap <silent> <C-L> <Plug>(searchhi-clear-all)
-vmap <silent> <C-L> <Plug>(searchhi-v-clear-all)
+nmap <silent> <leader>h <Plug>(searchhi-clear-all)
+vmap <silent> <leader>h <Plug>(searchhi-v-clear-all)

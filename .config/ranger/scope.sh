@@ -79,8 +79,8 @@ handle_extension() {
             transmission-show -- "${FILE_PATH}" && exit 5
             exit 1;;
 
-        ## OpenDocument
-        odt|ods|odp|sxw)
+        ## OpenDocument (ods and odp not working)
+        odt|sxw)
             ## Preview as text conversion
             odt2txt "${FILE_PATH}" && exit 5
             ## Preview as markdown conversion

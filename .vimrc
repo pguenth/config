@@ -205,10 +205,6 @@ set encoding=utf-8
 
 set updatetime=100 " reduced because of gitgutter
 
-" auto save options
-let g:auto_save = 1
-let g:auto_save_no_updatetime = 1
-let g:auto_save_in_insert_mode = 0
 
 " Status bar config
 
@@ -293,8 +289,6 @@ Plug 'tpope/vim-vinegar'
 
 " Plug 'valloric/youcompleteme'
 Plug 'vim-ctrlspace/vim-ctrlspace'
-
-Plug 'vim-scripts/vim-auto-save'
 
 Plug 'lervag/vimtex'
 
@@ -632,3 +626,25 @@ vmap gD <Plug>(searchhi-v-gD)
 
 nmap <silent> <leader>h <Plug>(searchhi-clear-all)
 vmap <silent> <leader>h <Plug>(searchhi-v-clear-all)
+
+" follow https://stackoverflow.com/a/6991712
+" for autosaving 
+"
+" manual auto save every X seconds
+let g:autosave_time = 10
+
+au BufRead,BufNewFile * let b:save_time = localtime()
+au TextChanged,CursorHold * call UpdateFile()
+au FocusLost,WinLeave,BufLeave * update
+
+function! UpdateFile()
+  if((!exists("b:save_time")) || (localtime() - b:save_time) >= g:autosave_time)
+      update
+      let b:save_time = localtime()
+  else
+      " just debugging info
+      echo "[+] ". (localtime() - b:save_time) ." seconds have elapsed so far."
+  endif
+endfunction
+
+au BufWritePre * let b:save_time = localtime()

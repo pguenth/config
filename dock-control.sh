@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ "$1" == "add" ]; then
-        /home/patrick/.screenlayout/uni-triple.sh
+        /home/patrick/.screenlayout/uni-triple-2.sh
         setxkbmap -layout eu -option caps:escape
         sudo systemctl stop netctl-auto@wlp2s0.service
         sudo netctl start dock-dhcp-noclientid

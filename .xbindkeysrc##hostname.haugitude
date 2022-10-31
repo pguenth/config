@@ -56,7 +56,10 @@
 
 "xonsh .scripts/brightness-latitude.xsh -25"
    XF86MonBrightnessDown
- 
+
+"xonsh .scripts/backlight-off-latitude.xsh"
+   Super_R 
+
 # div
 # no screensaver activated
 #"xscreensaver-command -lock"

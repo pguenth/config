@@ -3,3 +3,5 @@
 	name = Patrick Günther
 [core]
 	editor = vim
+[init]
+	defaultBranch = main

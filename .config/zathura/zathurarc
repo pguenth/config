@@ -1,6 +1,0 @@
-# 2-page view: odd pages left
-set first-page-column 2:1
-
-# keymaps for this
-map u set "first-page-column 2:1"
-map i set "first-page-column 2:2"

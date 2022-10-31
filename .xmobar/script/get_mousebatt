@@ -1,2 +1,0 @@
-#!/bin/bash
-solaar show 2>&1 | grep Battery | tail -n 1 | sed 's/[a-zA-Z, :.]*\([0-9]*%\)[a-zA-Z, :.]*\([0-9]*%\)[a-zA-Z, :.]*/\1 -> \2/g'
